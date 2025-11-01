@@ -27,14 +27,10 @@
  * @packageDocumentation
  */
 
-export { Box } from "./components/Box.js";
+export { BigText, type BigTextProps } from "./components/BigText.js";
+export { Box, type BoxProps } from "./components/Box.js";
 export { Spacer } from "./components/Spacer.js";
-export { Text } from "./components/Text.js";
+export { Text, type TextProps } from "./components/Text.js";
 export { render } from "./render.js";
 
-export type {
-  BoxProps,
-  RenderInstance,
-  RenderOptions,
-  TextProps,
-} from "./types.js";
+export type { RenderInstance, RenderOptions } from "./types.js";

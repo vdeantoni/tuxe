@@ -2,7 +2,7 @@
  * widget-sync.ts - Synchronize Yoga layout to unblessed widgets
  */
 
-import { Box, Element, Screen, Text } from "@unblessed/core";
+import { BigText, Box, Element, Screen, Text } from "@unblessed/core";
 import Yoga from "yoga-layout";
 import type { ComputedLayout, LayoutNode } from "./types.js";
 
@@ -32,16 +32,14 @@ export function getComputedLayout(node: LayoutNode): ComputedLayout {
  * @returns The created/updated unblessed widget
  */
 export function syncWidgetWithYoga(node: LayoutNode, screen: Screen): Element {
-  // Extract Yoga's computed layout (absolute coordinates)
+  // Extract Yoga's computed layout
   const layout = getComputedLayout(node);
 
-  // Convert to coordinates relative to parent's content box
-  // unblessed's append() expects positions relative to parent's content area (after border + padding)
   let top = layout.top;
   let left = layout.left;
 
   if (node.parent) {
-    // Get parent's border and padding from Yoga
+    // Get parent's border from Yoga
     const parentBorderTop = node.parent.yogaNode.getComputedBorder(
       Yoga.EDGE_TOP,
     );
@@ -49,7 +47,7 @@ export function syncWidgetWithYoga(node: LayoutNode, screen: Screen): Element {
       Yoga.EDGE_LEFT,
     );
 
-    // Convert from absolute to relative (relative to parent's content box)
+    // yoga and unblessed treat border differently, unblessed collapse border
     top = layout.top - parentBorderTop;
     left = layout.left - parentBorderLeft;
   }
@@ -69,6 +67,10 @@ export function syncWidgetWithYoga(node: LayoutNode, screen: Screen): Element {
     switch (node.type) {
       case "text": {
         WidgetClass = Text;
+        break;
+      }
+      case "bigtext": {
+        WidgetClass = BigText;
         break;
       }
     }

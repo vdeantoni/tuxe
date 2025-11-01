@@ -403,6 +403,7 @@ const reconciler = createReconciler<
   getCurrentEventPriority: () => DefaultEventPriority,
 
   // Update priority
+  // @ts-expect-error
   setCurrentUpdatePriority: () => {},
 
   // Scope (unused)

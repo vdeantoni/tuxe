@@ -9,9 +9,10 @@
  * the Yoga calculations and widget synchronization.
  */
 
-import type { Screen } from "@unblessed/core";
+import { BigText, Screen } from "@unblessed/core";
 import type { LayoutNode } from "@unblessed/layout";
-import type { BoxProps, TextProps } from "./types.js";
+import { BoxProps } from "./components/Box";
+import { TextProps } from "./components/Text";
 
 /**
  * Element types in our virtual DOM
@@ -36,7 +37,7 @@ export interface DOMNode {
   /**
    * React props for this node
    */
-  props: BoxProps | TextProps | Record<string, unknown>;
+  props: BoxProps | TextProps | BigText | Record<string, unknown>;
 
   /**
    * Parent DOM node

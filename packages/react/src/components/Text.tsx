@@ -2,8 +2,58 @@
  * Text.tsx - Text component for @unblessed/react
  */
 
+import type { ReactNode } from "react";
 import { forwardRef, type PropsWithChildren } from "react";
-import type { TextProps } from "../types.js";
+
+/**
+ * Props for Text component (text rendering with styling)
+ */
+export interface TextProps {
+  /**
+   * Text content
+   */
+  children?: ReactNode;
+
+  /**
+   * Text color
+   */
+  color?: string;
+
+  /**
+   * Background color
+   */
+  backgroundColor?: string;
+
+  /**
+   * Bold text
+   */
+  bold?: boolean;
+
+  /**
+   * Italic text
+   */
+  italic?: boolean;
+
+  /**
+   * Underline text
+   */
+  underline?: boolean;
+
+  /**
+   * Strikethrough text
+   */
+  strikethrough?: boolean;
+
+  /**
+   * Inverse colors
+   */
+  inverse?: boolean;
+
+  /**
+   * Dim text
+   */
+  dim?: boolean;
+}
 
 /**
  * Text component - Renders text with styling

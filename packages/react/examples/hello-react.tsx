@@ -7,7 +7,7 @@
  */
 import * as React from "react";
 import { Screen } from "../../node/dist/index.js";
-import { Box, render, Text } from "../dist/index.js";
+import { BigText, Box, render, Text } from "../dist/index.js";
 
 // WORKAROUND: In development, ensure runtime is initialized for source files too
 import { initCore } from "@unblessed/core";
@@ -19,7 +19,8 @@ const screen = new Screen({ smartCSR: true, fullUnicode: true });
 
 const App = () => (
   <Box flexDirection="column" padding={1} gap={1}>
-    {/* Title */}
+    <BigText>UNBLESSED</BigText>
+
     <Box
       flexDirection="column"
       padding={1}
