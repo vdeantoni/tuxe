@@ -1,0 +1,17 @@
+{
+  "name": "unblessed-browser-blessed-app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@unblessed/core": "latest",
+    "@unblessed/browser": "latest"
+  },
+  "devDependencies": {
+    "vite": "^7.1.10"
+  }
+}

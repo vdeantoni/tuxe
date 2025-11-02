@@ -1,0 +1,33 @@
+{
+  "name": "create-unblessed",
+  "version": "0.0.1",
+  "description": "A CLI to create new unblessed projects",
+  "author": "Vinicius De Antoni <vdeantoni@gmail.com>",
+  "license": "MIT",
+  "private": false,
+  "bin": {
+    "create-unblessed": "./dist/index.js"
+  },
+  "files": [
+    "index.js",
+    "templates",
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs --out-dir dist --clean",
+    "test": "vitest run",
+    "clean": "rimraf dist",
+    "lint": "eslint . --fix",
+    "lint:check": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "fs-extra": "^11.3.2"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "execa": "^9.6.0"
+  }
+}

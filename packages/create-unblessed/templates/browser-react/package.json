@@ -1,0 +1,18 @@
+{
+  "name": "unblessed-browser-react-app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@unblessed/react": "latest",
+    "@unblessed/browser": "latest",
+    "react": "^18.3.1"
+  },
+  "devDependencies": {
+    "vite": "^7.1.10"
+  }
+}
