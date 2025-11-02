@@ -79,12 +79,12 @@ const KeyboardGame = () => {
 
       {/* Score Panel */}
       <Box flexDirection="row" gap={2} justifyContent="center">
-        <Box borderStyle="single" borderColor="green" padding={1}>
+        <Box border={1} borderStyle="single" borderColor="green" padding={1}>
           <Text color="green" bold>
             Score: {score}
           </Text>
         </Box>
-        <Box borderStyle="single" borderColor="cyan" padding={1}>
+        <Box border={1} borderStyle="single" borderColor="cyan" padding={1}>
           <Text color="cyan">Stars: {stars.length}</Text>
         </Box>
       </Box>
@@ -93,6 +93,7 @@ const KeyboardGame = () => {
       <Box
         tabIndex={0}
         flexGrow={1}
+        border={1}
         borderStyle="double"
         borderColor="blue"
         padding={1}
@@ -142,13 +143,14 @@ const KeyboardGame = () => {
       </Box>
 
       {/* Status Panel */}
-      <Box borderStyle="single" borderColor="magenta" padding={1}>
+      <Box border={1} borderStyle="single" borderColor="magenta" padding={1}>
         <Text color="magenta">{gameMessage}</Text>
       </Box>
 
       {/* Instructions */}
       <Box
         flexDirection="column"
+        border={1}
         borderStyle="single"
         borderColor="white"
         padding={1}

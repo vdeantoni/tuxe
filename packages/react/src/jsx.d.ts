@@ -9,6 +9,7 @@ import type { TextProps } from "./components/Text.js";
 import type { BigTextProps } from "./components/BigText.js";
 import type { ButtonProps } from "./components/Button.js";
 import type { InputProps } from "./components/Input.js";
+import type { SpacerProps } from "./components/Spacer.js";
 
 declare global {
   namespace JSX {
@@ -18,6 +19,7 @@ declare global {
       bigtext: BigTextProps & { ref?: any };
       tbutton: ButtonProps & { ref?: any }; // Use 'tbutton' to avoid conflict with HTML button
       textinput: InputProps & { ref?: any }; // Use 'textinput' to avoid conflict with HTML input
+      spacer: SpacerProps & { ref?: any };
       root: any;
     }
   }

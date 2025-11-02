@@ -5,8 +5,9 @@
  * mount React components to an unblessed Screen.
  */
 
-import { LayoutManager, createLayoutNode } from "@unblessed/layout";
+import { LayoutManager } from "@unblessed/layout";
 import type { ReactNode } from "react";
+import { BoxDescriptor } from "./components/Box.js";
 import { createElement } from "./dom.js";
 import reconciler, { setLayoutManager } from "./reconciler.js";
 import type { RenderInstance, RenderOptions } from "./types.js";
@@ -54,11 +55,18 @@ export function render(
   // Set layout manager for reconciler to use
   setLayoutManager(manager);
 
-  // Create root layout node
-  const rootLayoutNode = createLayoutNode("root", {
+  // Create root layout node using BoxDescriptor (treat root like a box)
+  const rootDescriptor = new BoxDescriptor({
     width: screen.width || 80,
     height: screen.height || 24,
   });
+
+  const rootLayoutNode = manager.createNode(
+    "root",
+    rootDescriptor.flexProps,
+    rootDescriptor.widgetOptions,
+  );
+  rootLayoutNode._descriptor = rootDescriptor;
 
   // Create root DOM node
   const rootDOMNode = createElement("root", rootLayoutNode, {});

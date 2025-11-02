@@ -267,6 +267,13 @@ export interface LayoutNode {
    * Currently bound event handlers (used for cleanup on update).
    */
   _boundHandlers?: Record<string, Function>;
+
+  /**
+   * Widget descriptor instance (from @unblessed/react).
+   * This encapsulates all widget configuration and creation logic.
+   * Using `any` to avoid circular dependency.
+   */
+  _descriptor?: any;
 }
 
 /**

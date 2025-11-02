@@ -24,12 +24,12 @@ const App = () => (
     <BigText>UNBLESSED</BigText>
 
     <Box
-      flexDirecti
-      on="column"
+      flexDirection="column"
       padding={1}
       border={1}
       borderStyle="single"
       borderColor="cyan"
+      gap={1}
     >
       <Input borderColor="blue" />
       <Text>@unblessed/react Border Showcase</Text>

@@ -1,8 +1,50 @@
 /**
- * Spacer.tsx - Spacer component for @unblessed/react
+ * Spacer.tsx - Spacer component and descriptor for @unblessed/react
+ *
+ * Spacer is a special Box that grows to fill available space (flexGrow: 1)
  */
 
-import { Box } from "./Box.js";
+import { Box as BoxWidget, Screen } from "@unblessed/core";
+import type { ComputedLayout, FlexboxProps } from "@unblessed/layout";
+import { WidgetDescriptor } from "../widget-descriptors/base.js";
+
+/**
+ * Props interface for Spacer component
+ */
+export interface SpacerProps extends FlexboxProps {}
+
+/**
+ * Descriptor for Spacer widgets
+ */
+export class SpacerDescriptor extends WidgetDescriptor<SpacerProps> {
+  readonly type = "spacer";
+
+  get flexProps(): FlexboxProps {
+    // Spacer is just a box with flexGrow: 1
+    return {
+      ...this.props,
+      flexGrow: this.props.flexGrow !== undefined ? this.props.flexGrow : 1,
+    };
+  }
+
+  get widgetOptions() {
+    return {};
+  }
+
+  get eventHandlers() {
+    return {};
+  }
+
+  createWidget(layout: ComputedLayout, screen: Screen): BoxWidget {
+    return new BoxWidget({
+      screen,
+      top: layout.top,
+      left: layout.left,
+      width: layout.width,
+      height: layout.height,
+    });
+  }
+}
 
 /**
  * Spacer component - Flexible space that expands to fill available space
@@ -18,9 +60,18 @@ import { Box } from "./Box.js";
  *   <Box width={20}>Right</Box>
  * </Box>
  * ```
+ *
+ * @example With custom flexGrow
+ * ```tsx
+ * <Box flexDirection="row">
+ *   <Spacer flexGrow={2} />
+ *   <Box width={30}>Content</Box>
+ *   <Spacer flexGrow={1} />
+ * </Box>
+ * ```
  */
-export const Spacer = () => {
-  return <Box flexGrow={1} />;
+export const Spacer = (props: SpacerProps) => {
+  return <spacer {...props} />;
 };
 
 Spacer.displayName = "Spacer";

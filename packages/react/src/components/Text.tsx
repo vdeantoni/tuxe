@@ -1,58 +1,91 @@
 /**
- * Text.tsx - Text component for @unblessed/react
+ * Text.tsx - Text component and descriptor for @unblessed/react
  */
 
+import {
+  colors,
+  type Screen,
+  Text as TextWidget,
+} from "@unblessed/core";
+import type { ComputedLayout } from "@unblessed/layout";
 import type { ReactNode } from "react";
 import { forwardRef, type PropsWithChildren } from "react";
+import { WidgetDescriptor } from "../widget-descriptors/base.js";
+import type { TextStyleProps } from "../widget-descriptors/common-props.js";
 
 /**
- * Props for Text component (text rendering with styling)
+ * Props interface for Text component
  */
-export interface TextProps {
-  /**
-   * Text content
-   */
+export interface TextProps extends TextStyleProps {
+  content?: string;
   children?: ReactNode;
+}
 
-  /**
-   * Text color
-   */
-  color?: string;
+/**
+ * Descriptor for Text widgets
+ */
+export class TextDescriptor extends WidgetDescriptor<TextProps> {
+  readonly type = "text";
 
-  /**
-   * Background color
-   */
-  backgroundColor?: string;
+  get flexProps() {
+    // Text widgets don't have flex props - dimensions are calculated from content
+    return {};
+  }
 
-  /**
-   * Bold text
-   */
-  bold?: boolean;
+  get widgetOptions() {
+    const widgetOptions: any = {};
 
-  /**
-   * Italic text
-   */
-  italic?: boolean;
+    // Build style object
+    if (
+      this.props.color ||
+      this.props.backgroundColor ||
+      this.props.bold ||
+      this.props.italic ||
+      this.props.underline ||
+      this.props.strikethrough ||
+      this.props.inverse ||
+      this.props.dim
+    ) {
+      widgetOptions.style = {};
 
-  /**
-   * Underline text
-   */
-  underline?: boolean;
+      if (this.props.color) {
+        widgetOptions.style.fg = colors.convert(this.props.color);
+      }
+      if (this.props.backgroundColor) {
+        widgetOptions.style.bg = colors.convert(this.props.backgroundColor);
+      }
+      if (this.props.bold) widgetOptions.style.bold = true;
+      if (this.props.italic) widgetOptions.style.italic = true;
+      if (this.props.underline) widgetOptions.style.underline = true;
+      if (this.props.strikethrough) widgetOptions.style.strikethrough = true;
+      if (this.props.inverse) widgetOptions.style.inverse = true;
+      if (this.props.dim) widgetOptions.style.dim = true;
+    }
 
-  /**
-   * Strikethrough text
-   */
-  strikethrough?: boolean;
+    if (this.props.content !== undefined) {
+      widgetOptions.content = this.props.content;
+    }
 
-  /**
-   * Inverse colors
-   */
-  inverse?: boolean;
+    widgetOptions.tags = true;
 
-  /**
-   * Dim text
-   */
-  dim?: boolean;
+    return widgetOptions;
+  }
+
+  get eventHandlers() {
+    // Text widgets don't have event handlers
+    return {};
+  }
+
+  createWidget(layout: ComputedLayout, screen: Screen): TextWidget {
+    return new TextWidget({
+      screen,
+      top: layout.top,
+      left: layout.left,
+      width: layout.width,
+      height: layout.height,
+      ...this.widgetOptions,
+    });
+  }
 }
 
 /**

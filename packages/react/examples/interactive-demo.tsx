@@ -10,15 +10,14 @@
  * - Visual feedback
  */
 
-import { Screen } from "@unblessed/node";
+import { NodeRuntime, Screen } from "@unblessed/node";
 import React, { useState } from "react";
 
 // WORKAROUND: In development, ensure runtime is initialized for source files too
 import { initCore } from "@unblessed/core";
-import { NodeRuntime } from "@unblessed/node";
-initCore(new NodeRuntime());
-
 import { BigText, Box, Button, Input, render, Text } from "../src/index.js";
+
+initCore(new NodeRuntime());
 
 const InteractiveDemo = () => {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -42,6 +41,7 @@ const InteractiveDemo = () => {
       {/* Mouse Tracking Panel */}
       <Box
         flexDirection="column"
+        border={1}
         borderStyle="single"
         borderColor="green"
         padding={1}
@@ -66,6 +66,7 @@ const InteractiveDemo = () => {
       {/* Color Picker Panel */}
       <Box
         flexDirection="column"
+        border={1}
         borderStyle="single"
         borderColor="yellow"
         padding={1}
@@ -80,6 +81,7 @@ const InteractiveDemo = () => {
               key={color}
               width={8}
               height={3}
+              border={1}
               borderStyle={selectedColor === color ? "double" : "single"}
               borderColor={color}
               backgroundColor={selectedColor === color ? color : undefined}
@@ -98,6 +100,7 @@ const InteractiveDemo = () => {
         <Box
           flexDirection="column"
           flexGrow={1}
+          border={1}
           borderStyle="single"
           borderColor="blue"
           padding={1}
@@ -110,15 +113,17 @@ const InteractiveDemo = () => {
             <Button
               width={8}
               height={3}
+              border={1}
               borderColor="red"
               hoverBg="red"
-              onClick={() => setClickCount((c) => Math.max(0, c - 1))}
+              onPress={() => setClickCount((c) => Math.max(0, c - 1))}
             >
-              <Text> - </Text>
+              {"{center}-{/center}"}
             </Button>
             <Box
               width={10}
               height={3}
+              border={1}
               borderStyle="single"
               justifyContent="center"
               alignItems="center"
@@ -128,11 +133,12 @@ const InteractiveDemo = () => {
             <Button
               width={8}
               height={3}
+              border={1}
               borderColor="green"
               hoverBg="green"
-              onClick={() => setClickCount((c) => c + 1)}
+              onPress={() => setClickCount((c) => c + 1)}
             >
-              <Text> + </Text>
+              {"{center}+{/center}"}
             </Button>
           </Box>
         </Box>
@@ -141,6 +147,7 @@ const InteractiveDemo = () => {
         <Box
           flexDirection="column"
           flexGrow={1}
+          border={1}
           borderStyle="single"
           borderColor="magenta"
           padding={1}
@@ -151,7 +158,9 @@ const InteractiveDemo = () => {
           </Text>
           <Text>Last Key: {lastKey || "(none)"}</Text>
           <Box
+            tabIndex={0}
             height={3}
+            border={1}
             borderStyle="single"
             borderColor="white"
             onKeyPress={(ch, key) => {
@@ -170,6 +179,7 @@ const InteractiveDemo = () => {
       {/* Message Input Panel */}
       <Box
         flexDirection="column"
+        border={1}
         borderStyle="single"
         borderColor="cyan"
         padding={1}
@@ -179,6 +189,7 @@ const InteractiveDemo = () => {
           💬 Message Board (type and press Enter)
         </Text>
         <Input
+          border={1}
           borderColor="cyan"
           autoFocus
           onSubmit={(value) => {
@@ -192,7 +203,12 @@ const InteractiveDemo = () => {
           }}
         />
         {message && (
-          <Box borderStyle="single" borderColor={selectedColor} padding={1}>
+          <Box
+            border={1}
+            borderStyle="single"
+            borderColor={selectedColor}
+            padding={1}
+          >
             <Text color={selectedColor} bold>
               {message}
             </Text>
@@ -223,7 +239,7 @@ screen.key(["C-c"], () => {
 });
 
 // Render the app
-render(<InteractiveDemo />, { screen });
+render(<InteractiveDemo />, { screen, debug: false });
 
 // Initial render
 screen.render();

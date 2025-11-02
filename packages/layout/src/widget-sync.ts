@@ -2,15 +2,7 @@
  * widget-sync.ts - Synchronize Yoga layout to unblessed widgets
  */
 
-import {
-  BigText,
-  Box,
-  Button,
-  Element,
-  Screen,
-  Text,
-  Textbox,
-} from "@unblessed/core";
+import { Box, Element, Screen } from "@unblessed/core";
 import Yoga from "yoga-layout";
 import type { ComputedLayout, LayoutNode } from "./types.js";
 
@@ -85,55 +77,51 @@ export function syncWidgetWithYoga(node: LayoutNode, screen: Screen): Element {
 
   if (!node.widget) {
     // First render - create new widget
-    let WidgetClass = Box;
-    switch (node.type) {
-      case "text": {
-        WidgetClass = Text;
-        break;
-      }
-      case "bigtext": {
-        WidgetClass = BigText;
-        break;
-      }
-      case "button":
-      case "tbutton": {
-        WidgetClass = Button;
-        break;
-      }
-      case "input":
-      case "textinput": {
-        WidgetClass = Textbox;
-        break;
-      }
+    if (node._descriptor) {
+      // Use descriptor if available (from React)
+      const adjustedLayout = { ...layout, top, left };
+      node.widget = node._descriptor.createWidget(adjustedLayout, screen);
+    } else {
+      // Fallback: create a simple Box widget (for standalone layout usage)
+      node.widget = new Box({
+        screen,
+        tags: true,
+        mouse: true,
+        keys: true,
+        top,
+        left,
+        width: layout.width,
+        height: layout.height,
+        ...node.widgetOptions,
+      });
     }
 
-    node.widget = new WidgetClass({
-      screen,
-      tags: true,
-      mouse: true,
-      keys: true,
-      inputOnFocus: true,
-      top,
-      left,
-      width: layout.width,
-      height: layout.height,
-      ...node.widgetOptions,
-    });
-
+    // Bind event handlers after widget is created
+    // TypeScript can't infer widget is non-null here, so we assert it
     if (node.eventHandlers && Object.keys(node.eventHandlers).length > 0) {
-      bindEventHandlers(node.widget, node.eventHandlers);
+      bindEventHandlers(node.widget!, node.eventHandlers);
       node._boundHandlers = node.eventHandlers;
     }
   } else {
-    node.widget.position.top = top;
-    node.widget.position.left = left;
-    node.widget.position.width = layout.width;
-    node.widget.position.height = layout.height;
+    // Update existing widget
+    const adjustedLayout = { ...layout, top, left };
 
-    if (node.widgetOptions) {
-      Object.assign(node.widget, node.widgetOptions);
+    if (node._descriptor) {
+      // Use descriptor's update method (from React)
+      node._descriptor.updateWidget(node.widget, adjustedLayout);
+    } else {
+      // Fallback: manually update (for standalone layout usage)
+      node.widget.position.top = top;
+      node.widget.position.left = left;
+      node.widget.position.width = layout.width;
+      node.widget.position.height = layout.height;
+
+      if (node.widgetOptions) {
+        Object.assign(node.widget, node.widgetOptions);
+      }
     }
 
+    // Update event handlers
     if (node.eventHandlers) {
       if (node._boundHandlers) {
         unbindEventHandlers(node.widget, node._boundHandlers);
@@ -148,11 +136,15 @@ export function syncWidgetWithYoga(node: LayoutNode, screen: Screen): Element {
     }
   }
 
+  // At this point, node.widget is guaranteed to be defined (either just created or already existed)
+  // TypeScript can't infer this, so we use non-null assertion
+  const widget = node.widget!;
+
   for (const child of node.children) {
     const childWidget = syncWidgetWithYoga(child, screen);
 
-    if (childWidget.parent !== node.widget) {
-      node.widget.append(childWidget);
+    if (childWidget.parent !== widget) {
+      widget.append(childWidget);
     }
   }
 
@@ -166,12 +158,12 @@ export function syncWidgetWithYoga(node: LayoutNode, screen: Screen): Element {
         .join("");
 
       if (fullContent) {
-        node.widget.setContent(fullContent);
+        widget.setContent(fullContent);
       }
     }
   }
 
-  return node.widget;
+  return widget;
 }
 
 /**
@@ -180,6 +172,7 @@ export function syncWidgetWithYoga(node: LayoutNode, screen: Screen): Element {
 export function syncTreeAndRender(rootNode: LayoutNode, screen: Screen): void {
   const rootWidget = syncWidgetWithYoga(rootNode, screen);
 
+  // Attach root widget to screen if not already attached
   if (!rootWidget.parent) {
     screen.append(rootWidget);
   }

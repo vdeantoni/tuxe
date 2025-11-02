@@ -1,15 +1,88 @@
 /**
- * BigText.tsx - BigText component for @unblessed/react
+ * BigText.tsx - BigText component and descriptor for @unblessed/react
  */
 
+import {
+  BigText as BigTextWidget,
+  colors,
+  type Screen,
+} from "@unblessed/core";
+import type { ComputedLayout, FlexboxProps } from "@unblessed/layout";
 import { forwardRef, type PropsWithChildren } from "react";
-import type { BoxProps } from "./Box.js";
+import { WidgetDescriptor } from "../widget-descriptors/base.js";
+import type { TextStyleProps } from "../widget-descriptors/common-props.js";
 
 /**
- * Props for BigText component
+ * Props interface for BigText component
  */
-export interface BigTextProps extends BoxProps {
+export interface BigTextProps extends FlexboxProps, TextStyleProps {
+  font?: string;
+  fontBold?: boolean;
+  fch?: string;
+  content?: string;
   children?: string;
+}
+
+/**
+ * Descriptor for BigText widgets
+ */
+export class BigTextDescriptor extends WidgetDescriptor<BigTextProps> {
+  readonly type = "bigtext";
+
+  get flexProps(): FlexboxProps {
+    const { width, height, margin } = this.props;
+    const flexProps: FlexboxProps = {};
+    if (width !== undefined) flexProps.width = width;
+    if (height !== undefined) flexProps.height = height;
+    if (margin !== undefined) flexProps.margin = margin;
+    return flexProps;
+  }
+
+  get widgetOptions() {
+    const options: any = {};
+    if (this.props.font) options.font = this.props.font;
+    if (this.props.fontBold) options.fontBold = this.props.fontBold;
+    if (this.props.fch) options.fch = this.props.fch;
+    if (this.props.content !== undefined) options.content = this.props.content;
+
+    // Build style object for text colors
+    if (
+      this.props.color ||
+      this.props.backgroundColor ||
+      this.props.bold ||
+      this.props.italic ||
+      this.props.underline
+    ) {
+      options.style = {};
+
+      if (this.props.color) {
+        options.style.fg = colors.convert(this.props.color);
+      }
+      if (this.props.backgroundColor) {
+        options.style.bg = colors.convert(this.props.backgroundColor);
+      }
+      if (this.props.bold) options.style.bold = true;
+      if (this.props.italic) options.style.italic = true;
+      if (this.props.underline) options.style.underline = true;
+    }
+
+    return options;
+  }
+
+  get eventHandlers() {
+    return {};
+  }
+
+  createWidget(layout: ComputedLayout, screen: Screen): BigTextWidget {
+    return new BigTextWidget({
+      screen,
+      top: layout.top,
+      left: layout.left,
+      width: layout.width,
+      height: layout.height,
+      ...this.widgetOptions,
+    });
+  }
 }
 
 /**
