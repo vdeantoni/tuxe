@@ -3,9 +3,9 @@
  */
 
 import { Screen } from "@unblessed/core";
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import React, { useState } from "react";
-import { render, Box, Text } from "../src/index.js";
+import { useState } from "react";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { Box, render, Text } from "../src/index.js";
 
 describe("Content Updates", () => {
   let screen: Screen;

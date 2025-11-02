@@ -2,11 +2,7 @@
  * BigText.tsx - BigText component and descriptor for @unblessed/react
  */
 
-import {
-  BigText as BigTextWidget,
-  colors,
-  type Screen,
-} from "@unblessed/core";
+import { BigText as BigTextWidget, colors, type Screen } from "@unblessed/core";
 import type { ComputedLayout, FlexboxProps } from "@unblessed/layout";
 import { forwardRef, type PropsWithChildren } from "react";
 import { WidgetDescriptor } from "../widget-descriptors/base.js";

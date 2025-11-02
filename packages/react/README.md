@@ -161,12 +161,7 @@ Automatically calculates dimensions based on font (14 rows × 8 columns per char
 Interactive button component with hover and focus effects.
 
 ```tsx
-<Button
-  hoverBg="blue"
-  focusBg="cyan"
-  borderStyle="single"
-  padding={1}
->
+<Button hoverBg="blue" focusBg="cyan" borderStyle="single" padding={1}>
   Click Me
 </Button>
 ```
@@ -184,12 +179,7 @@ Interactive button component with hover and focus effects.
 Text input component for user interaction.
 
 ```tsx
-<Input
-  autoFocus
-  borderStyle="single"
-  borderColor="blue"
-  height={3}
-/>
+<Input autoFocus borderStyle="single" borderColor="blue" height={3} />
 ```
 
 **Props:**
@@ -288,6 +278,7 @@ All components support React-style event handlers that are automatically bound t
 ```
 
 **Available:**
+
 - `onClick`, `onMouseDown`, `onMouseUp`
 - `onMouseMove`, `onMouseOver`, `onMouseOut`
 - `onMouseWheel`, `onWheelDown`, `onWheelUp`
@@ -297,10 +288,10 @@ All components support React-style event handlers that are automatically bound t
 ```tsx
 <Box
   onKeyPress={(ch, key) => {
-    if (key.name === 'enter') {
-      console.log('Enter pressed!');
+    if (key.name === "enter") {
+      console.log("Enter pressed!");
     }
-    if (key.ctrl && key.name === 'c') {
+    if (key.ctrl && key.name === "c") {
       process.exit(0);
     }
   }}
@@ -313,8 +304,8 @@ All components support React-style event handlers that are automatically bound t
 
 ```tsx
 <Button
-  onFocus={() => console.log('Button focused')}
-  onBlur={() => console.log('Button blurred')}
+  onFocus={() => console.log("Button focused")}
+  onBlur={() => console.log("Button blurred")}
 >
   Focus me
 </Button>
@@ -323,18 +314,18 @@ All components support React-style event handlers that are automatically bound t
 ### Widget-Specific Events
 
 **Button:**
+
 ```tsx
-<Button onPress={() => console.log('Button pressed!')}>
-  Submit
-</Button>
+<Button onPress={() => console.log("Button pressed!")}>Submit</Button>
 ```
 
 **Input:**
+
 ```tsx
 <Input
-  onSubmit={(value) => console.log('Submitted:', value)}
-  onCancel={() => console.log('Cancelled')}
-  onKeyPress={(ch, key) => console.log('Key:', key.name)}
+  onSubmit={(value) => console.log("Submitted:", value)}
+  onCancel={() => console.log("Cancelled")}
+  onKeyPress={(ch, key) => console.log("Key:", key.name)}
 />
 ```
 
@@ -358,8 +349,8 @@ const Counter = () => {
         borderStyle="single"
         borderColor="green"
         padding={1}
-        onClick={() => setCount(c => c + 1)}
-        onPress={() => setCount(c => c + 1)}
+        onClick={() => setCount((c) => c + 1)}
+        onPress={() => setCount((c) => c + 1)}
       >
         Increment
       </Button>
@@ -411,6 +402,7 @@ Terminal Rendering
 The architecture uses several different "node" types, each with a specific responsibility:
 
 #### 1. **YogaNode** (from `yoga-layout`)
+
 The low-level flexbox layout engine (C++/WASM). Calculates positions and sizes based on flexbox properties.
 
 ```typescript
@@ -421,43 +413,46 @@ yogaNode.calculateLayout(); // Computes layout
 ```
 
 #### 2. **LayoutNode** (from `@unblessed/layout`)
+
 Wraps YogaNode with metadata, bridging React props to Yoga calculations and unblessed widgets.
 
 ```typescript
 interface LayoutNode {
-  type: string;              // 'box', 'text', 'button', etc.
-  yogaNode: YogaNode;       // The Yoga layout engine
-  props: FlexboxProps;      // width, height, padding, gap, etc.
-  widgetOptions: any;       // border, colors, content, etc.
-  widget?: Element;         // The final unblessed widget
-  eventHandlers?: Record<string, Function>;  // Event handlers to bind
+  type: string; // 'box', 'text', 'button', etc.
+  yogaNode: YogaNode; // The Yoga layout engine
+  props: FlexboxProps; // width, height, padding, gap, etc.
+  widgetOptions: any; // border, colors, content, etc.
+  widget?: Element; // The final unblessed widget
+  eventHandlers?: Record<string, Function>; // Event handlers to bind
 }
 ```
 
 #### 3. **DOMNode** (from `@unblessed/react`)
+
 Virtual DOM element used by React reconciler. Wraps LayoutNode with React-specific data.
 
 ```typescript
 interface DOMNode {
-  type: ElementType;        // 'box', 'text', 'root'
-  layoutNode: LayoutNode;   // References the layout layer
-  props: BoxProps;          // React component props
-  childNodes: AnyNode[];    // Virtual DOM children
+  type: ElementType; // 'box', 'text', 'root'
+  layoutNode: LayoutNode; // References the layout layer
+  props: BoxProps; // React component props
+  childNodes: AnyNode[]; // Virtual DOM children
 }
 ```
 
 #### 4. **Widget/Element** (from `@unblessed/core`)
+
 The actual terminal UI widget that renders to screen. Created after Yoga calculates layout.
 
 ```typescript
 // Box, Text, Button, etc.
 new Box({
-  top: 10,      // From Yoga calculations
+  top: 10, // From Yoga calculations
   left: 20,
   width: 50,
   height: 30,
-  border: { type: 'line' },
-  content: 'Hello'
+  border: { type: "line" },
+  content: "Hello",
 });
 ```
 
@@ -506,14 +501,15 @@ Here's what happens:
 
 Each layer has a specific responsibility:
 
-| Layer | Responsibility |
-|-------|---------------|
-| **DOMNode** | React reconciler - manages virtual DOM tree |
+| Layer          | Responsibility                                        |
+| -------------- | ----------------------------------------------------- |
+| **DOMNode**    | React reconciler - manages virtual DOM tree           |
 | **LayoutNode** | Bridge between React props, layout engine, and events |
-| **YogaNode** | Pure flexbox calculations (no UI concerns) |
-| **Widget** | Terminal rendering (no layout concerns) |
+| **YogaNode**   | Pure flexbox calculations (no UI concerns)            |
+| **Widget**     | Terminal rendering (no layout concerns)               |
 
 This separation allows:
+
 - React to handle component lifecycle
 - Yoga to handle layout calculations
 - unblessed to handle terminal rendering

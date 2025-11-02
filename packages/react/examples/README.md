@@ -22,6 +22,7 @@ tsx keyboard-game.tsx
 ### hello-react.tsx
 
 Basic demonstration of components and layouts:
+
 - Box layouts with flexbox
 - Border styles and colors (per-side)
 - Text styling
@@ -30,6 +31,7 @@ Basic demonstration of components and layouts:
 - Gap and padding
 
 **Features:**
+
 - Static layout showcase
 - Border color examples
 - Component composition
@@ -68,6 +70,7 @@ Comprehensive interactive demo showcasing event handling:
    - Ctrl+C handling
 
 **Controls:**
+
 - Move mouse to track position
 - Click anywhere in mouse tracker
 - Click color swatches to select
@@ -81,17 +84,20 @@ Comprehensive interactive demo showcasing event handling:
 A simple game demonstrating keyboard event handling:
 
 **Gameplay:**
+
 - Move player (🎮) around grid
 - Collect stars (⭐) for points
 - Real-time score tracking
 - New stars spawn after collection
 
 **Controls:**
+
 - **Arrow Keys** or **WASD** - Move player
 - **R** - Reset game
 - **Q** or **Ctrl+C** - Quit
 
 **Event Features:**
+
 - `onKeyPress` for movement and controls
 - `useState` for game state
 - `useEffect` for collision detection
@@ -135,8 +141,8 @@ const MyExample = () => {
 const screen = new Screen({
   smartCSR: true,
   fullUnicode: true,
-  mouse: true,  // Enable if using mouse events
-  keys: true,   // Enable if using keyboard events
+  mouse: true, // Enable if using mouse events
+  keys: true, // Enable if using keyboard events
 });
 
 screen.key(["C-c"], () => process.exit(0));
@@ -160,11 +166,13 @@ screen.render();
 Make sure you have the runtime workaround at the top of your example file.
 
 **Events not firing:**
+
 - Verify `mouse: true` in Screen options for mouse events
 - Verify `keys: true` in Screen options for keyboard events
 - Check that widgets have `mouse: true` and `keys: true` (automatically set in widget-sync)
 
 **Display issues:**
+
 - Run `screen.render()` after the initial render
 - Use `smartCSR: true` for better performance
 - Set explicit width/height on root Box for consistent layouts

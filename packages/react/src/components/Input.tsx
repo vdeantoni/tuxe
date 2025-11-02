@@ -4,8 +4,7 @@
 
 import { type Screen, Textbox } from "@unblessed/core";
 import type { ComputedLayout, FlexboxProps } from "@unblessed/layout";
-import type { ReactNode } from "react";
-import { forwardRef, type PropsWithChildren } from "react";
+import { forwardRef } from "react";
 import type { InteractiveWidgetProps } from "../widget-descriptors/common-props.js";
 import { WidgetWithBordersDescriptor } from "../widget-descriptors/WidgetWithBordersDescriptor.js";
 
@@ -15,7 +14,6 @@ import { WidgetWithBordersDescriptor } from "../widget-descriptors/WidgetWithBor
  */
 export interface InputProps extends InteractiveWidgetProps {
   value?: string;
-  children?: ReactNode;
 }
 
 /**
@@ -110,10 +108,8 @@ export class InputDescriptor extends WidgetWithBordersDescriptor<InputProps> {
  * />
  * ```
  */
-export const Input = forwardRef<any, PropsWithChildren<InputProps>>(
-  ({ children, ...props }, ref) => {
-    return <textinput ref={ref} border={1} height={3} {...props} />;
-  },
-);
+export const Input = forwardRef<any, InputProps>(({ ...props }, ref) => {
+  return <textinput ref={ref} border={1} height={3} {...props} />;
+});
 
 Input.displayName = "Input";
