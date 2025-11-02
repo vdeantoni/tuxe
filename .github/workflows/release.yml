@@ -5,9 +5,9 @@ on:
     branches: [main, alpha, beta]
 
 permissions:
-  contents: write      # Create releases and tags
-  id-token: write      # Required for npm provenance
-  issues: write        # Comment on issues
+  contents: write # Create releases and tags
+  id-token: write # Required for npm provenance
+  issues: write # Comment on issues
   pull-requests: write # Comment on PRs
 
 jobs:
@@ -29,14 +29,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'pnpm'
-          registry-url: 'https://registry.npmjs.org'
+          cache: "pnpm"
+          registry-url: "https://registry.npmjs.org"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-
-#      - name: Install Playwright browsers
-#        run: pnpm --filter @unblessed/browser exec playwright install --with-deps chromium firefox webkit
 
       - name: Setup Turbo cache
         uses: actions/cache@v4
@@ -48,18 +45,6 @@ jobs:
 
       - name: Build packages
         run: pnpm build
-
-#      - name: Run tests with coverage
-#        run: pnpm test:coverage
-#
-#      - name: Upload coverage to Codecov
-#        uses: codecov/codecov-action@v5
-#        with:
-#          token: ${{ secrets.CODECOV_TOKEN }}
-#          fail_ci_if_error: false
-#          files: ./packages/*/coverage/lcov.info
-#          flags: unittests
-#          name: codecov-umbrella
 
       - name: Semantic Release
         env:
