@@ -1,3 +1,15 @@
+# [1.0.0-alpha.15](https://github.com/vdeantoni/unblessed/compare/v1.0.0-alpha.14...v1.0.0-alpha.15) (2025-11-02)
+
+
+### Bug Fixes
+
+* **ci:** removed codecov and optimized actions ([435793b](https://github.com/vdeantoni/unblessed/commit/435793b610265a49d0e9ea9e1b850c678a1beb6d))
+
+
+### Features
+
+* **create:** create-unblessed package ([715ce91](https://github.com/vdeantoni/unblessed/commit/715ce9157d8ddf14da792690a51de4a53cfe01f4))
+
 # [1.0.0-alpha.14](https://github.com/vdeantoni/unblessed/compare/v1.0.0-alpha.13...v1.0.0-alpha.14) (2025-11-02)
 
 

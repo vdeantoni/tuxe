@@ -1,7 +1,7 @@
 {
   "name": "@unblessed/core",
   "description": "Platform-agnostic terminal UI core library with runtime dependency injection",
-  "version": "1.0.0-alpha.14",
+  "version": "1.0.0-alpha.15",
   "author": "Vinicius De Antoni <vdeantoni@gmail.com>",
   "license": "MIT",
   "publishConfig": {

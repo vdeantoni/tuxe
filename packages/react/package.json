@@ -1,7 +1,7 @@
 {
   "name": "@unblessed/react",
   "description": "React renderer for unblessed with flexbox layout support",
-  "version": "1.0.0-alpha.14",
+  "version": "1.0.0-alpha.15",
   "author": "Vinicius De Antoni <vdeantoni@gmail.com>",
   "license": "MIT",
   "publishConfig": {
