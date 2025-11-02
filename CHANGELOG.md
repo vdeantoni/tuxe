@@ -1,3 +1,10 @@
+# [1.0.0-alpha.16](https://github.com/vdeantoni/unblessed/compare/v1.0.0-alpha.15...v1.0.0-alpha.16) (2025-11-02)
+
+
+### Bug Fixes
+
+* **ci:** publish create-unblessed ([238debc](https://github.com/vdeantoni/unblessed/commit/238debc4284353f57ad5bc14acc7ce8873f906e9))
+
 # [1.0.0-alpha.15](https://github.com/vdeantoni/unblessed/compare/v1.0.0-alpha.14...v1.0.0-alpha.15) (2025-11-02)
 
 
