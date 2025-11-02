@@ -2,11 +2,7 @@
  * Text.tsx - Text component and descriptor for @unblessed/react
  */
 
-import {
-  colors,
-  type Screen,
-  Text as TextWidget,
-} from "@unblessed/core";
+import { colors, type Screen, Text as TextWidget } from "@unblessed/core";
 import type { ComputedLayout } from "@unblessed/layout";
 import type { ReactNode } from "react";
 import { forwardRef, type PropsWithChildren } from "react";

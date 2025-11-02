@@ -6,15 +6,21 @@
  */
 
 import { colors } from "@unblessed/core";
-import type { BorderProps } from "./common-props.js";
 import { WidgetDescriptor } from "./base.js";
+import type { BorderProps } from "./common-props.js";
 
 /**
  * Base descriptor for widgets that support borders
  * Provides shared buildBorder() and prepareBorderStyle() methods
  */
 export abstract class WidgetWithBordersDescriptor<
-  TProps extends BorderProps & { border?: number; borderTop?: number; borderBottom?: number; borderLeft?: number; borderRight?: number },
+  TProps extends BorderProps & {
+    border?: number;
+    borderTop?: number;
+    borderBottom?: number;
+    borderLeft?: number;
+    borderRight?: number;
+  },
 > extends WidgetDescriptor<TProps> {
   /**
    * Builds border object from inherited BorderProps

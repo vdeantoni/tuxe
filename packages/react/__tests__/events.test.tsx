@@ -3,8 +3,8 @@
  */
 
 import { Screen } from "@unblessed/core";
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { render, Box, Button, Input } from "../src/index.js";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { Box, render } from "../src/index.js";
 
 describe("Event Handling", () => {
   let screen: Screen;
@@ -92,10 +92,7 @@ describe("Event Handling", () => {
   it("should bind onSubmit handler to Input widget", () => {
     const onSubmit = vi.fn();
 
-    render(
-      <textinput width={20} height={3} onSubmit={onSubmit} />,
-      { screen },
-    );
+    render(<textinput width={20} height={3} onSubmit={onSubmit} />, { screen });
 
     const widget = screen.children[0].children[0];
 

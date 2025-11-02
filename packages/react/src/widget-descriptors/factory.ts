@@ -5,13 +5,13 @@
  * from React props.
  */
 
-import { WidgetDescriptor } from "./base.js";
 import { BigTextDescriptor } from "../components/BigText.js";
 import { BoxDescriptor } from "../components/Box.js";
 import { ButtonDescriptor } from "../components/Button.js";
 import { InputDescriptor } from "../components/Input.js";
 import { SpacerDescriptor } from "../components/Spacer.js";
 import { TextDescriptor } from "../components/Text.js";
+import { WidgetDescriptor } from "./base.js";
 
 /**
  * Registry mapping type strings to descriptor class constructors

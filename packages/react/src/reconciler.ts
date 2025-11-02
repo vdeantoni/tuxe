@@ -28,7 +28,6 @@ import { createDescriptor } from "./widget-descriptors/index.js";
 
 type Props = Record<string, unknown>;
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 type HostContext = {};
 
 let currentLayoutManager: LayoutManager | null = null;
@@ -179,7 +178,7 @@ const reconciler = createReconciler<
   },
 
   // Updates
-  prepareUpdate(_instance, _type, _oldProps, _newProps) {
+  prepareUpdate() {
     // Return non-null to indicate update is needed
     // The actual update happens in commitUpdate
     return true;

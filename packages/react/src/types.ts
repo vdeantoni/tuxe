@@ -2,8 +2,8 @@
  * types.ts - Type definitions for @unblessed/react
  */
 
-import { Screen } from "@unblessed/core";
 import type { KeyEvent, MouseEvent } from "@unblessed/core";
+import { Screen } from "@unblessed/core";
 import type { ReactNode } from "react";
 
 /**

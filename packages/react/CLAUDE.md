@@ -32,7 +32,7 @@ const App = () => {
         borderStyle="single"
         borderColor="green"
         padding={1}
-        onClick={() => setCount(c => c + 1)}
+        onClick={() => setCount((c) => c + 1)}
       >
         Click me!
       </Button>
@@ -97,6 +97,7 @@ All React components support event handling through React-style props (onClick, 
 ### Supported Events
 
 **Mouse Events:**
+
 - `onClick` → `click`
 - `onMouseDown` → `mousedown`
 - `onMouseUp` → `mouseup`
@@ -106,13 +107,16 @@ All React components support event handling through React-style props (onClick, 
 - `onMouseWheel` → `mousewheel`
 
 **Keyboard Events:**
+
 - `onKeyPress` → `keypress`
 
 **Focus Events:**
+
 - `onFocus` → `focus`
 - `onBlur` → `blur`
 
 **Widget-Specific Events:**
+
 - `onPress` → `press` (Button)
 - `onSubmit` → `submit` (Input/Textarea)
 - `onCancel` → `cancel` (Input/Textarea)
@@ -150,7 +154,10 @@ interface LayoutNode {
 Events are bound when widgets are created/updated:
 
 ```typescript
-function bindEventHandlers(widget: Element, handlers: Record<string, Function>) {
+function bindEventHandlers(
+  widget: Element,
+  handlers: Record<string, Function>,
+) {
   for (const [event, handler] of Object.entries(handlers)) {
     widget.on(event, handler);
   }
@@ -162,7 +169,10 @@ function bindEventHandlers(widget: Element, handlers: Record<string, Function>) 
 Old handlers are unbound before binding new ones:
 
 ```typescript
-function unbindEventHandlers(widget: Element, handlers: Record<string, Function>) {
+function unbindEventHandlers(
+  widget: Element,
+  handlers: Record<string, Function>,
+) {
   for (const [event, handler] of Object.entries(handlers)) {
     widget.removeListener(event, handler);
   }
@@ -172,39 +182,44 @@ function unbindEventHandlers(widget: Element, handlers: Record<string, Function>
 ### Usage Examples
 
 **Click Handler:**
+
 ```tsx
-<Box onClick={(data) => console.log('Clicked at', data.x, data.y)}>
+<Box onClick={(data) => console.log("Clicked at", data.x, data.y)}>
   Click me
 </Box>
 ```
 
 **Keyboard Handler:**
+
 ```tsx
-<Box onKeyPress={(ch, key) => {
-  if (key.name === 'enter') handleSubmit();
-}}>
+<Box
+  onKeyPress={(ch, key) => {
+    if (key.name === "enter") handleSubmit();
+  }}
+>
   Press Enter
 </Box>
 ```
 
 **Button Component:**
+
 ```tsx
-<Button onPress={() => console.log('Pressed!')}>
-  Submit
-</Button>
+<Button onPress={() => console.log("Pressed!")}>Submit</Button>
 ```
 
 **Input Component:**
+
 ```tsx
 <Input
-  onSubmit={(value) => console.log('Submitted:', value)}
-  onCancel={() => console.log('Cancelled')}
+  onSubmit={(value) => console.log("Submitted:", value)}
+  onCancel={() => console.log("Cancelled")}
 />
 ```
 
 ### JSX Element Names
 
 To avoid conflicts with HTML elements, custom element names are used:
+
 - `<tbutton>` - Button (avoids HTML `<button>`)
 - `<textinput>` - Input (avoids HTML `<input>`)
 
@@ -308,11 +323,11 @@ Box widgets should only have border colors in `style.border.*`, not text colors 
 ```typescript
 // In syncWidgetWithYoga(), after syncing all children:
 if (node.children.length > 0) {
-  const allTextNodes = node.children.every(c => c.type === "#text");
+  const allTextNodes = node.children.every((c) => c.type === "#text");
 
   if (allTextNodes) {
     const fullContent = node.children
-      .map(c => c.widgetOptions?.content || "")
+      .map((c) => c.widgetOptions?.content || "")
       .join("");
 
     node.widget.setContent(fullContent);
@@ -425,12 +440,14 @@ packages/react/
 **Current tests (10):**
 
 **Render tests (4):**
+
 - Basic rendering without crashing
 - Box component rendering
 - Flexbox layout with flexGrow
 - Spacer component
 
 **Event tests (6):**
+
 - onClick handler binding
 - onKeyPress handler binding
 - onPress handler binding (Button)
@@ -439,6 +456,7 @@ packages/react/
 - Cleanup on unmount
 
 **Content update tests (2):**
+
 - Text content updates on state changes
 - Multiple text widgets update independently
 
@@ -527,6 +545,7 @@ When adding border support, remember:
 **@unblessed/react** brings React's declarative component model to terminal UIs. It integrates React's reconciler with @unblessed/layout's Yoga engine and unblessed's rendering capabilities.
 
 **Key insights:**
+
 - The reconciler manages LayoutNodes, not widgets directly
 - LayoutManager handles Yoga calculations and widget synchronization
 - Event props are extracted and bound to unblessed EventEmitter

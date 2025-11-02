@@ -4,12 +4,12 @@
  * Declares the custom intrinsic JSX elements that our reconciler handles.
  */
 
-import type { BoxProps } from "./components/Box.js";
-import type { TextProps } from "./components/Text.js";
 import type { BigTextProps } from "./components/BigText.js";
+import type { BoxProps } from "./components/Box.js";
 import type { ButtonProps } from "./components/Button.js";
 import type { InputProps } from "./components/Input.js";
 import type { SpacerProps } from "./components/Spacer.js";
+import type { TextProps } from "./components/Text.js";
 
 declare global {
   namespace JSX {
