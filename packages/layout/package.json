@@ -59,13 +59,16 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
-    "@unblessed/core": "workspace:*",
     "yoga-layout": "^3.2.1"
   },
   "devDependencies": {
+    "@unblessed/core": "workspace:*",
     "@unblessed/node": "workspace:*",
     "@vitest/coverage-v8": "^3.2.4",
     "@vitest/ui": "^3.2.4"
+  },
+  "peerDependencies": {
+    "@unblessed/core": "workspace:^"
   },
   "engines": {
     "node": ">= 22.0.0"

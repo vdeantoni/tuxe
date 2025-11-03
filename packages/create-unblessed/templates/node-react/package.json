@@ -1,12 +1,21 @@
 {
   "name": "unblessed-node-react-app",
   "version": "1.0.0",
-  "main": "index.js",
+  "type": "module",
   "scripts": {
-    "start": "node index.js"
+    "start": "tsx index.tsx",
+    "build": "tsc",
+    "dev": "tsx watch index.tsx"
   },
   "dependencies": {
-    "@unblessed/react": "latest",
-    "@unblessed/node": "latest"
+    "@unblessed/core": "^latest",
+    "@unblessed/react": "^latest",
+    "@unblessed/node": "^latest",
+    "react": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.18",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
   }
 }

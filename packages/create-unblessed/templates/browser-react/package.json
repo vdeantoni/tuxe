@@ -10,9 +10,11 @@
   "dependencies": {
     "@unblessed/react": "latest",
     "@unblessed/browser": "latest",
-    "react": "^18.3.1"
+    "react": "^18.3.1",
+    "xterm": "^5.5.0"
   },
   "devDependencies": {
+    "typescript": "^5.7.2",
     "vite": "^7.1.10"
   }
 }

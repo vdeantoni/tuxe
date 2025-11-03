@@ -1,16 +1,15 @@
-import blessed from "@unblessed/core";
-import { Screen } from "@unblessed/node";
+import { Box, Screen } from "@unblessed/node";
 
 const screen = new Screen();
 
-blessed.box({
+new Box({
   parent: screen,
   content: "Hello World",
   left: "center",
   top: "center",
   width: "shrink",
   height: "shrink",
-  border: "line",
+  border: { type: "line" },
 });
 
 screen.key(["escape", "q", "C-c"], () => process.exit(0));

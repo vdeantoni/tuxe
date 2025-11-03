@@ -61,11 +61,11 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
-    "@unblessed/core": "workspace:*",
     "@unblessed/layout": "workspace:*",
     "react-reconciler": "0.29.2"
   },
   "devDependencies": {
+    "@unblessed/core": "workspace:*",
     "@unblessed/node": "workspace:*",
     "@testing-library/react": "^16.1.0",
     "@types/react": "^18.3.18",
@@ -75,6 +75,7 @@
     "react": "^18.3.1"
   },
   "peerDependencies": {
+    "@unblessed/core": "workspace:^",
     "react": "^18.0.0"
   },
   "engines": {

@@ -73,7 +73,6 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
-    "@unblessed/core": "workspace:*",
     "assert": "^2.1.0",
     "buffer": "^6.0.3",
     "events": "^3.3.0",
@@ -92,6 +91,7 @@
     "jsdom": "^25.0.1"
   },
   "peerDependencies": {
+    "@unblessed/core": "workspace:^",
     "xterm": "^5.0.0"
   },
   "engines": {

@@ -187,9 +187,6 @@ importers:
 
   packages/browser:
     dependencies:
-      '@unblessed/core':
-        specifier: workspace:*
-        version: link:../core
       assert:
         specifier: ^2.1.0
         version: 2.1.0
@@ -224,6 +221,9 @@ importers:
       '@types/path-browserify':
         specifier: ^1.0.3
         version: 1.0.3
+      '@unblessed/core':
+        specifier: workspace:*
+        version: link:../core
       '@vitest/coverage-v8':
         specifier: ^3.2.4
         version: 3.2.4(vitest@3.2.4)
@@ -261,13 +261,13 @@ importers:
 
   packages/layout:
     dependencies:
-      '@unblessed/core':
-        specifier: workspace:*
-        version: link:../core
       yoga-layout:
         specifier: ^3.2.1
         version: 3.2.1
     devDependencies:
+      '@unblessed/core':
+        specifier: workspace:*
+        version: link:../core
       '@unblessed/node':
         specifier: workspace:*
         version: link:../node
@@ -280,9 +280,6 @@ importers:
 
   packages/node:
     dependencies:
-      '@unblessed/core':
-        specifier: workspace:*
-        version: link:../core
       omggif:
         specifier: ^1.0.10
         version: 1.0.10
@@ -290,6 +287,9 @@ importers:
         specifier: ^7.0.0
         version: 7.0.0
     devDependencies:
+      '@unblessed/core':
+        specifier: workspace:*
+        version: link:../core
       '@unblessed/vrt':
         specifier: workspace:*
         version: link:../vrt
@@ -302,9 +302,6 @@ importers:
 
   packages/react:
     dependencies:
-      '@unblessed/core':
-        specifier: workspace:*
-        version: link:../core
       '@unblessed/layout':
         specifier: workspace:*
         version: link:../layout
@@ -321,6 +318,9 @@ importers:
       '@types/react-reconciler':
         specifier: ^0.28.8
         version: 0.28.9(@types/react@18.3.26)
+      '@unblessed/core':
+        specifier: workspace:*
+        version: link:../core
       '@unblessed/node':
         specifier: workspace:*
         version: link:../node

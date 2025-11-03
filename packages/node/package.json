@@ -69,15 +69,15 @@
     "example:interactive": "tsx examples/interactive.ts",
     "example:dashboard": "tsx examples/dashboard.ts"
   },
-  "dependencies": {
-    "@unblessed/core": "workspace:*"
-  },
+  "dependencies": {},
   "devDependencies": {
+    "@unblessed/core": "workspace:*",
     "@unblessed/vrt": "workspace:*",
     "@vitest/coverage-v8": "^3.2.4",
     "@vitest/ui": "^3.2.4"
   },
   "peerDependencies": {
+    "@unblessed/core": "workspace:^",
     "omggif": "^1.0.10",
     "pngjs": "^7.0.0"
   },

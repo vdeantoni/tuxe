@@ -1,5 +1,7 @@
-import { createScreen } from "@unblessed/browser";
+import { Screen } from "@unblessed/browser";
 import { Box, render, Text } from "@unblessed/react";
+import { Terminal } from "xterm";
+import "xterm/css/xterm.css";
 
 const App = () => (
   <Box>
@@ -7,8 +9,15 @@ const App = () => (
   </Box>
 );
 
-const screen = createScreen({
-  parent: document.getElementById("root"),
+// Create XTerm terminal
+const term = new Terminal({
+  cursorBlink: true,
+  cols: 80,
+  rows: 24,
 });
+term.open(document.getElementById("root")!);
+
+// Create screen with XTerm
+const screen = new Screen({ terminal: term });
 
 render(<App />, screen);
