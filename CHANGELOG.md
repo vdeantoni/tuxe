@@ -1,3 +1,12 @@
+# [1.0.0-alpha.17](https://github.com/vdeantoni/unblessed/compare/v1.0.0-alpha.16...v1.0.0-alpha.17) (2025-11-03)
+
+
+### Features
+
+* **create:** Fixed template dependenceis ([1566b79](https://github.com/vdeantoni/unblessed/commit/1566b79f576a9e7b05727fb447b128dd9a048f55))
+* **react:** add CSS-like state styling and List component ([4b320a5](https://github.com/vdeantoni/unblessed/commit/4b320a5cbe56476e3c6e4a04cbc065296dc9aa8c))
+* **react:** Widget descriptor composition refactor ([b5fe972](https://github.com/vdeantoni/unblessed/commit/b5fe97291a503a61793a0f974cb3e695636798a5))
+
 # [1.0.0-alpha.16](https://github.com/vdeantoni/unblessed/compare/v1.0.0-alpha.15...v1.0.0-alpha.16) (2025-11-02)
 
 

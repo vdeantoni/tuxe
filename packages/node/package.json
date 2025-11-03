@@ -1,7 +1,7 @@
 {
   "name": "@unblessed/node",
   "description": "Node.js runtime adapter for @unblessed/core terminal UI library",
-  "version": "1.0.0-alpha.16",
+  "version": "1.0.0-alpha.17",
   "author": "Vinicius De Antoni <vdeantoni@gmail.com>",
   "license": "MIT",
   "publishConfig": {

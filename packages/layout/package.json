@@ -1,7 +1,7 @@
 {
   "name": "@unblessed/layout",
   "description": "Flexbox layout engine for unblessed using Yoga",
-  "version": "1.0.0-alpha.16",
+  "version": "1.0.0-alpha.17",
   "author": "Vinicius De Antoni <vdeantoni@gmail.com>",
   "license": "MIT",
   "publishConfig": {

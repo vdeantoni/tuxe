@@ -1,6 +1,6 @@
 {
   "name": "create-unblessed",
-  "version": "1.0.0-alpha.16",
+  "version": "1.0.0-alpha.17",
   "description": "A CLI to create new unblessed projects",
   "author": "Vinicius De Antoni <vdeantoni@gmail.com>",
   "license": "MIT",
