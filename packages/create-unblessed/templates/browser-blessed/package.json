@@ -8,8 +8,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@unblessed/core": "latest",
-    "@unblessed/browser": "latest",
+    "@unblessed/core": "^1.0.0-alpha",
+    "@unblessed/browser": "^1.0.0-alpha",
     "xterm": "^5.5.0"
   },
   "devDependencies": {

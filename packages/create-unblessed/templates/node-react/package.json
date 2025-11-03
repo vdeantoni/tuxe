@@ -8,9 +8,9 @@
     "dev": "tsx watch index.tsx"
   },
   "dependencies": {
-    "@unblessed/core": "^latest",
-    "@unblessed/react": "^latest",
-    "@unblessed/node": "^latest",
+    "@unblessed/core": "^1.0.0-alpha",
+    "@unblessed/react": "^1.0.0-alpha",
+    "@unblessed/node": "^1.0.0-alpha",
     "react": "^18.3.1"
   },
   "devDependencies": {
