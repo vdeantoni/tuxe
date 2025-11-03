@@ -3,22 +3,11 @@
  */
 
 import { type Screen, Textbox } from "@unblessed/core";
-import {
-  ComputedLayout,
-  FlexboxProps,
-  WidgetDescriptor,
-} from "@unblessed/layout";
+import { ComputedLayout } from "@unblessed/layout";
 import { forwardRef } from "react";
 import type { InteractiveWidgetProps } from "../widget-descriptors/common-props.js";
-import {
-  buildBorder,
-  buildFocusableOptions,
-  buildStyleObject,
-  extractStyleProps,
-  mergeStyles,
-  prepareBorderStyle,
-} from "../widget-descriptors/helpers.js";
-import { COMMON_WIDGET_OPTIONS } from "./Box";
+import { buildFocusableOptions } from "../widget-descriptors/helpers.js";
+import { BoxDescriptor, COMMON_WIDGET_OPTIONS } from "./Box";
 
 /**
  * Props interface for Input component
@@ -34,64 +23,14 @@ export interface InputProps extends InteractiveWidgetProps {
 /**
  * Descriptor for Input/Textbox widgets
  */
-export class InputDescriptor extends WidgetDescriptor<InputProps> {
-  readonly type = "input";
+export class InputDescriptor extends BoxDescriptor<InputProps> {
+  override readonly type = "input";
 
-  get flexProps(): FlexboxProps {
-    const { padding, width, height, margin } = this.props;
-    const flexProps: FlexboxProps = {};
-    if (padding !== undefined) flexProps.padding = padding;
-    if (width !== undefined) flexProps.width = width;
-    if (height !== undefined) flexProps.height = height;
-    if (margin !== undefined) flexProps.margin = margin;
-    return flexProps;
-  }
-
-  get widgetOptions() {
-    const options: any = {};
-
-    // Build border using helper function
-    const border = buildBorder(this.props);
-    if (border) {
-      options.border = border;
-      // Pre-populate style.border.fg
-      options.style = prepareBorderStyle(border);
-    } else {
-      // Even without border, we need a style object
-      options.style = {};
-    }
-
-    // Ensure input has visible text (set fg if not already set)
-    // This prevents invisible text when only border colors are set
-    if (!options.style.fg) {
-      options.style.fg = 7; // White/default terminal foreground
-    }
-
-    // Ensure style.border exists if hover/focus have border effects
-    // This prevents errors when setEffects tries to save original border values
-    if (this.props.hover?.border || this.props.focus?.border) {
-      options.style.border = options.style.border || {};
-    }
+  override get widgetOptions() {
+    const options: any = super.widgetOptions;
 
     // Build focusable options using helper function
     Object.assign(options, buildFocusableOptions(this.props, 0));
-
-    // Base/default state styling from direct props
-    const defaultStyle = extractStyleProps(this.props);
-    const baseStyle = buildStyleObject(defaultStyle);
-    if (Object.keys(baseStyle).length > 0) {
-      options.style = mergeStyles(options.style, baseStyle);
-    }
-
-    // Hover effects
-    if (this.props.hover) {
-      options.hoverEffects = buildStyleObject(this.props.hover);
-    }
-
-    // Focus effects
-    if (this.props.focus) {
-      options.focusEffects = buildStyleObject(this.props.focus);
-    }
 
     // Input value: controlled (value) or uncontrolled (defaultValue)
     // In controlled mode, value is managed externally
@@ -105,17 +44,14 @@ export class InputDescriptor extends WidgetDescriptor<InputProps> {
     return options;
   }
 
-  get eventHandlers() {
+  override get eventHandlers() {
     const handlers: Record<string, Function> = {};
     if (this.props.onSubmit) handlers.submit = this.props.onSubmit;
     if (this.props.onCancel) handlers.cancel = this.props.onCancel;
-    if (this.props.onKeyPress) handlers.keypress = this.props.onKeyPress;
-    if (this.props.onFocus) handlers.focus = this.props.onFocus;
-    if (this.props.onBlur) handlers.blur = this.props.onBlur;
     return handlers;
   }
 
-  createWidget(layout: ComputedLayout, screen: Screen): Textbox {
+  override createWidget(layout: ComputedLayout, screen: Screen): Textbox {
     return new Textbox({
       screen,
       ...COMMON_WIDGET_OPTIONS,
@@ -190,7 +126,7 @@ export class InputDescriptor extends WidgetDescriptor<InputProps> {
  * ```
  */
 export const Input = forwardRef<any, InputProps>(({ ...props }, ref) => {
-  return <textinput ref={ref} border={1} height={3} {...props} />;
+  return <textinput ref={ref} border={1} height={3} color="white" {...props} />;
 });
 
 Input.displayName = "Input";

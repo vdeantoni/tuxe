@@ -5,7 +5,7 @@
 import { BigText as BigTextWidget, type Screen } from "@unblessed/core";
 import { ComputedLayout, FlexboxProps } from "@unblessed/layout";
 import { forwardRef, type PropsWithChildren } from "react";
-import type { StyleObject } from "../widget-descriptors/common-props.js";
+import { StyleObject } from "../widget-descriptors";
 import { BoxDescriptor, COMMON_WIDGET_OPTIONS } from "./Box";
 
 /**

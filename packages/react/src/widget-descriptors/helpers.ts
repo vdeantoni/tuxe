@@ -206,7 +206,7 @@ export function mergeStyles(...styles: any[]): any {
     for (const [key, value] of Object.entries(style)) {
       if (key === "border" && merged.border) {
         // Merge border objects
-        merged.border = { ...merged.border, ...value };
+        merged.border = { ...merged.border, ...(value as any) };
       } else {
         merged[key] = value;
       }

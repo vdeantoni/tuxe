@@ -3,23 +3,12 @@
  */
 
 import { Button as ButtonWidget, type Screen } from "@unblessed/core";
-import {
-  ComputedLayout,
-  FlexboxProps,
-  WidgetDescriptor,
-} from "@unblessed/layout";
+import { ComputedLayout } from "@unblessed/layout";
 import type { ReactNode } from "react";
 import { forwardRef, type PropsWithChildren } from "react";
 import type { InteractiveWidgetProps } from "../widget-descriptors/common-props.js";
-import {
-  buildBorder,
-  buildFocusableOptions,
-  buildStyleObject,
-  extractStyleProps,
-  mergeStyles,
-  prepareBorderStyle,
-} from "../widget-descriptors/helpers.js";
-import { COMMON_WIDGET_OPTIONS } from "./Box";
+import { buildFocusableOptions } from "../widget-descriptors/helpers.js";
+import { BoxDescriptor, COMMON_WIDGET_OPTIONS } from "./Box";
 
 /**
  * Props interface for Button component
@@ -33,57 +22,14 @@ export interface ButtonProps extends InteractiveWidgetProps {
 /**
  * Descriptor for Button widgets
  */
-export class ButtonDescriptor extends WidgetDescriptor<ButtonProps> {
-  readonly type = "button";
+export class ButtonDescriptor extends BoxDescriptor<ButtonProps> {
+  override readonly type = "button";
 
-  get flexProps(): FlexboxProps {
-    const { padding, width, height, margin } = this.props;
-    const flexProps: FlexboxProps = {};
-    if (padding !== undefined) flexProps.padding = padding;
-    if (width !== undefined) flexProps.width = width;
-    if (height !== undefined) flexProps.height = height;
-    if (margin !== undefined) flexProps.margin = margin;
-    return flexProps;
-  }
-
-  get widgetOptions() {
-    const options: any = {};
-
-    // Build border using helper function
-    const border = buildBorder(this.props);
-    if (border) {
-      options.border = border;
-      // Pre-populate style.border.fg
-      options.style = prepareBorderStyle(border);
-    } else {
-      options.style = {};
-    }
-
-    // Ensure style.border exists if hover/focus have border effects
-    // This prevents errors when setEffects tries to save original border values
-    if (this.props.hover?.border || this.props.focus?.border) {
-      options.style.border = options.style.border || {};
-    }
+  override get widgetOptions() {
+    const options = super.widgetOptions;
 
     // Build focusable options using helper function
     Object.assign(options, buildFocusableOptions(this.props, 0));
-
-    // Base/default state styling from direct props
-    const defaultStyle = extractStyleProps(this.props);
-    const baseStyle = buildStyleObject(defaultStyle);
-    if (Object.keys(baseStyle).length > 0) {
-      options.style = mergeStyles(options.style, baseStyle);
-    }
-
-    // Hover effects
-    if (this.props.hover) {
-      options.hoverEffects = buildStyleObject(this.props.hover);
-    }
-
-    // Focus effects
-    if (this.props.focus) {
-      options.focusEffects = buildStyleObject(this.props.focus);
-    }
 
     // Button-specific options
     if (this.props.content !== undefined) options.content = this.props.content;
@@ -91,17 +37,13 @@ export class ButtonDescriptor extends WidgetDescriptor<ButtonProps> {
     return options;
   }
 
-  get eventHandlers() {
-    const handlers: Record<string, Function> = {};
-    if (this.props.onClick) handlers.click = this.props.onClick;
+  override get eventHandlers() {
+    const handlers: Record<string, Function> = super.eventHandlers;
     if (this.props.onPress) handlers.press = this.props.onPress;
-    if (this.props.onKeyPress) handlers.keypress = this.props.onKeyPress;
-    if (this.props.onFocus) handlers.focus = this.props.onFocus;
-    if (this.props.onBlur) handlers.blur = this.props.onBlur;
     return handlers;
   }
 
-  createWidget(layout: ComputedLayout, screen: Screen): ButtonWidget {
+  override createWidget(layout: ComputedLayout, screen: Screen): ButtonWidget {
     return new ButtonWidget({
       screen,
       ...COMMON_WIDGET_OPTIONS,

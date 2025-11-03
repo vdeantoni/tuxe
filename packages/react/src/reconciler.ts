@@ -24,7 +24,7 @@ import {
   type TextNode,
   updateNodeProps,
 } from "./dom.js";
-import { createDescriptor } from "./widget-descriptors/index.js";
+import { createDescriptor } from "./widget-descriptors";
 
 type Props = Record<string, unknown>;
 

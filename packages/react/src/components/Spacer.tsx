@@ -10,7 +10,6 @@ import {
   FlexboxProps,
   WidgetDescriptor,
 } from "@unblessed/layout";
-import { COMMON_WIDGET_OPTIONS } from "./Box";
 
 /**
  * Props interface for Spacer component
@@ -42,7 +41,6 @@ export class SpacerDescriptor extends WidgetDescriptor<SpacerProps> {
   createWidget(layout: ComputedLayout, screen: Screen): BoxWidget {
     return new BoxWidget({
       screen,
-      ...COMMON_WIDGET_OPTIONS,
       top: layout.top,
       left: layout.left,
       width: layout.width,

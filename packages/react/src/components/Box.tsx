@@ -10,7 +10,7 @@ import {
 } from "@unblessed/layout";
 import type { ReactNode } from "react";
 import { forwardRef, type PropsWithChildren } from "react";
-import type { InteractiveWidgetProps } from "../widget-descriptors/common-props.js";
+import { InteractiveWidgetProps } from "../widget-descriptors";
 import {
   buildBorder,
   buildFocusableOptions,
@@ -24,6 +24,7 @@ export const COMMON_WIDGET_OPTIONS = {
   tags: true,
   mouse: true,
   keys: true,
+  clickable: true,
 };
 
 /**

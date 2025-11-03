@@ -9,6 +9,7 @@ export type {
   InteractiveWidgetProps,
   StyleObject,
 } from "./common-props.js";
+export { createDescriptor } from "./factory.js";
 export {
   buildBorder,
   buildFocusableOptions,
@@ -25,8 +26,3 @@ export { InputDescriptor, type InputProps } from "../components/Input.js";
 export { ListDescriptor, type ListProps } from "../components/List.js";
 export { SpacerDescriptor, type SpacerProps } from "../components/Spacer.js";
 export { TextDescriptor, type TextProps } from "../components/Text.js";
-export {
-  createDescriptor,
-  getRegisteredTypes,
-  registerDescriptor,
-} from "./factory.js";

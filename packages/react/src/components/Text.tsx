@@ -56,6 +56,7 @@ export class TextDescriptor extends WidgetDescriptor<TextProps> {
     return new TextWidget({
       screen,
       ...COMMON_WIDGET_OPTIONS,
+      clickable: false,
       top: layout.top,
       left: layout.left,
       width: layout.width,
