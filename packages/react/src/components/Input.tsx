@@ -5,8 +5,13 @@
 import { type Screen, Textbox } from "@unblessed/core";
 import type { ComputedLayout, FlexboxProps } from "@unblessed/layout";
 import { forwardRef } from "react";
+import { WidgetDescriptor } from "../widget-descriptors/base.js";
 import type { InteractiveWidgetProps } from "../widget-descriptors/common-props.js";
-import { WidgetWithBordersDescriptor } from "../widget-descriptors/WidgetWithBordersDescriptor.js";
+import {
+  buildBorder,
+  buildFocusableOptions,
+  prepareBorderStyle,
+} from "../widget-descriptors/helpers.js";
 
 /**
  * Props interface for Input component
@@ -19,7 +24,7 @@ export interface InputProps extends InteractiveWidgetProps {
 /**
  * Descriptor for Input/Textbox widgets
  */
-export class InputDescriptor extends WidgetWithBordersDescriptor<InputProps> {
+export class InputDescriptor extends WidgetDescriptor<InputProps> {
   readonly type = "input";
 
   get flexProps(): FlexboxProps {
@@ -35,24 +40,28 @@ export class InputDescriptor extends WidgetWithBordersDescriptor<InputProps> {
   get widgetOptions() {
     const options: any = {};
 
-    // Build border from inherited BorderProps
-    const border = this.buildBorder();
+    // Build border using helper function
+    const border = buildBorder(this.props);
     if (border) {
       options.border = border;
       // Pre-populate style.border.fg
-      options.style = this.prepareBorderStyle(border);
+      options.style = prepareBorderStyle(border);
+    } else {
+      // Even without border, we need a style object
+      options.style = {};
     }
+
+    // Ensure input has visible text (set fg if not already set)
+    // This prevents invisible text when only border colors are set
+    if (!options.style.fg) {
+      options.style.fg = 7; // White/default terminal foreground
+    }
+
+    // Build focusable options using helper function
+    Object.assign(options, buildFocusableOptions(this.props, 0));
 
     // Input-specific options
     if (this.props.value !== undefined) options.value = this.props.value;
-
-    // Focusable options (inherited from FocusableProps)
-    // Default tabIndex = 0 for inputs
-    options.tabIndex =
-      this.props.tabIndex !== undefined ? this.props.tabIndex : 0;
-    if (this.props.autoFocus !== undefined) {
-      options.autoFocus = this.props.autoFocus;
-    }
 
     return options;
   }

@@ -7,17 +7,28 @@ import type { ComputedLayout, FlexboxProps } from "@unblessed/layout";
 import type { ReactNode } from "react";
 import { forwardRef, type PropsWithChildren } from "react";
 import type { ReactEventProps } from "../types.js";
-import type { BorderProps } from "../widget-descriptors/common-props.js";
-import { WidgetWithBordersDescriptor } from "../widget-descriptors/WidgetWithBordersDescriptor.js";
+import { WidgetDescriptor } from "../widget-descriptors/base.js";
+import type {
+  BorderProps,
+  TextStyleProps,
+} from "../widget-descriptors/common-props.js";
+import {
+  buildBorder,
+  buildTextStyles,
+  mergeStyles,
+  prepareBorderStyle,
+} from "../widget-descriptors/helpers.js";
 
 /**
  * Props interface for Box component
  * Combines flexbox layout props with box-specific visual properties
  */
-export interface BoxProps extends FlexboxProps, ReactEventProps, BorderProps {
+export interface BoxProps
+  extends FlexboxProps,
+    ReactEventProps,
+    BorderProps,
+    TextStyleProps {
   tabIndex?: number;
-  backgroundColor?: string;
-  color?: string;
   tags?: boolean;
   content?: string;
   children?: ReactNode;
@@ -26,7 +37,7 @@ export interface BoxProps extends FlexboxProps, ReactEventProps, BorderProps {
 /**
  * Descriptor for Box widgets
  */
-export class BoxDescriptor extends WidgetWithBordersDescriptor<BoxProps> {
+export class BoxDescriptor extends WidgetDescriptor<BoxProps> {
   readonly type = "box";
 
   get flexProps(): FlexboxProps {
@@ -121,12 +132,19 @@ export class BoxDescriptor extends WidgetWithBordersDescriptor<BoxProps> {
   get widgetOptions(): Record<string, any> {
     const widgetOptions: any = {};
 
-    // Build border using inherited method from WidgetWithBordersDescriptor
-    const border = this.buildBorder();
+    // Build border using helper function
+    const border = buildBorder(this.props);
     if (border) {
       widgetOptions.border = border;
-      // Pre-populate style.border.fg using inherited method
-      widgetOptions.style = this.prepareBorderStyle(border);
+    }
+
+    // Build text styles using helper function
+    const textStyles = buildTextStyles(this.props);
+
+    // Merge border style and text styles
+    const mergedStyles = mergeStyles(prepareBorderStyle(border), textStyles);
+    if (mergedStyles) {
+      widgetOptions.style = mergedStyles;
     }
 
     // Content

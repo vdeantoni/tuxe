@@ -2,12 +2,13 @@
  * Text.tsx - Text component and descriptor for @unblessed/react
  */
 
-import { colors, type Screen, Text as TextWidget } from "@unblessed/core";
+import { type Screen, Text as TextWidget } from "@unblessed/core";
 import type { ComputedLayout } from "@unblessed/layout";
 import type { ReactNode } from "react";
 import { forwardRef, type PropsWithChildren } from "react";
 import { WidgetDescriptor } from "../widget-descriptors/base.js";
 import type { TextStyleProps } from "../widget-descriptors/common-props.js";
+import { buildTextStyles } from "../widget-descriptors/helpers.js";
 
 /**
  * Props interface for Text component
@@ -31,31 +32,10 @@ export class TextDescriptor extends WidgetDescriptor<TextProps> {
   get widgetOptions() {
     const widgetOptions: any = {};
 
-    // Build style object
-    if (
-      this.props.color ||
-      this.props.backgroundColor ||
-      this.props.bold ||
-      this.props.italic ||
-      this.props.underline ||
-      this.props.strikethrough ||
-      this.props.inverse ||
-      this.props.dim
-    ) {
-      widgetOptions.style = {};
-
-      if (this.props.color) {
-        widgetOptions.style.fg = colors.convert(this.props.color);
-      }
-      if (this.props.backgroundColor) {
-        widgetOptions.style.bg = colors.convert(this.props.backgroundColor);
-      }
-      if (this.props.bold) widgetOptions.style.bold = true;
-      if (this.props.italic) widgetOptions.style.italic = true;
-      if (this.props.underline) widgetOptions.style.underline = true;
-      if (this.props.strikethrough) widgetOptions.style.strikethrough = true;
-      if (this.props.inverse) widgetOptions.style.inverse = true;
-      if (this.props.dim) widgetOptions.style.dim = true;
+    // Build text styles using helper function
+    const textStyles = buildTextStyles(this.props);
+    if (textStyles) {
+      widgetOptions.style = textStyles;
     }
 
     if (this.props.content !== undefined) {

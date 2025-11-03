@@ -49,7 +49,7 @@ import { render, Box, Text, Spacer } from "@unblessed/react";
 
 const App = () => (
   <Box flexDirection="column" padding={1} gap={1}>
-    <Box borderStyle="single" padding={1}>
+    <Box border={1} borderStyle="single" padding={1}>
       <Text color="green" bold>
         Hello from React!
       </Text>
@@ -68,6 +68,8 @@ render(<App />);
 
 **Note:** The runtime (`@unblessed/node` or `@unblessed/browser`) auto-initializes when imported, so you don't need explicit initialization.
 
+**Important:** Borders require `border={1}` (or `borderTop={1}`, etc.) so that Yoga reserves space for them. Without this, only `borderStyle` and `borderColor` won't work properly.
+
 ## Components
 
 ### Box
@@ -79,6 +81,7 @@ Container component with flexbox layout support.
   flexDirection="row" // Layout direction
   gap={2} // Gap between children
   padding={1} // Padding
+  border={1} // Enable border (required for Yoga layout)
   borderStyle="single" // Border style
   borderColor="cyan" // Border color
   width={40} // Fixed width
@@ -161,7 +164,13 @@ Automatically calculates dimensions based on font (14 rows × 8 columns per char
 Interactive button component with hover and focus effects.
 
 ```tsx
-<Button hoverBg="blue" focusBg="cyan" borderStyle="single" padding={1}>
+<Button
+  border={1}
+  borderStyle="single"
+  hoverBg="blue"
+  focusBg="cyan"
+  padding={1}
+>
   Click Me
 </Button>
 ```
@@ -173,22 +182,38 @@ Interactive button component with hover and focus effects.
 - `focusBg` - Border color when focused
 - `onClick` - Click handler
 - `onPress` - Press handler (Enter key or click)
+- `tabIndex` - Focus order (default: 0)
+- `autoFocus` - Auto-focus on mount
+
+**Note:** Inherits all interactive properties including borders, events, and focus management.
 
 ### Input
 
 Text input component for user interaction.
 
 ```tsx
-<Input autoFocus borderStyle="single" borderColor="blue" height={3} />
+<Input
+  border={1}
+  borderStyle="single"
+  borderColor="blue"
+  height={3}
+  autoFocus
+  onSubmit={(value) => console.log("Submitted:", value)}
+  onCancel={() => console.log("Cancelled")}
+/>
 ```
 
 **Props:**
 
 - All Box props (flexbox, border, colors, events, etc.)
 - `autoFocus` - Automatically focus on mount
+- `value` - Input value
 - `onSubmit` - Submit handler (Enter key)
 - `onCancel` - Cancel handler (Escape key)
 - `onKeyPress` - Key press handler
+- `tabIndex` - Focus order (default: 0)
+
+**Note:** Inherits all interactive properties including borders, events, and focus management.
 
 ## Examples
 
@@ -198,19 +223,19 @@ Text input component for user interaction.
 const Dashboard = () => (
   <Box flexDirection="column" width={80} height={24}>
     {/* Header */}
-    <Box height={3} borderStyle="single">
+    <Box height={3} border={1} borderStyle="single">
       <Text bold>Dashboard</Text>
     </Box>
 
     {/* Content area */}
     <Box flexDirection="row" flexGrow={1}>
       {/* Sidebar */}
-      <Box width={20} borderStyle="single">
+      <Box width={20} border={1} borderStyle="single">
         <Text>Menu</Text>
       </Box>
 
       {/* Main content */}
-      <Box flexGrow={1} borderStyle="single">
+      <Box flexGrow={1} border={1} borderStyle="single">
         <Text>Content area</Text>
       </Box>
     </Box>
@@ -225,7 +250,7 @@ render(<Dashboard />);
 ```tsx
 const Centered = () => (
   <Box justifyContent="center" alignItems="center" width={80} height={24}>
-    <Box borderStyle="double" padding={2}>
+    <Box border={1} borderStyle="double" padding={2}>
       <Text color="cyan" bold>
         Centered!
       </Text>
@@ -245,12 +270,12 @@ const LoginForm = () => (
 
     <Box flexDirection="column" gap={1}>
       <Text>Username:</Text>
-      <Input autoFocus borderColor="blue" />
+      <Input border={1} borderColor="blue" autoFocus />
 
       <Text>Password:</Text>
-      <Input borderColor="blue" />
+      <Input border={1} borderColor="blue" />
 
-      <Button hoverBg="green" focusBg="cyan" padding={1}>
+      <Button border={1} hoverBg="green" focusBg="cyan" padding={1}>
         <Text>Login</Text>
       </Button>
     </Box>
@@ -341,11 +366,12 @@ const Counter = () => {
 
   return (
     <Box flexDirection="column" gap={1} padding={2}>
-      <Box borderStyle="single" padding={1}>
+      <Box border={1} borderStyle="single" padding={1}>
         <Text>Count: {count}</Text>
       </Box>
 
       <Button
+        border={1}
         borderStyle="single"
         borderColor="green"
         padding={1}
@@ -356,6 +382,7 @@ const Counter = () => {
       </Button>
 
       <Input
+        border={1}
         borderColor="blue"
         onSubmit={(value) => {
           setName(value);
@@ -382,6 +409,28 @@ render(<Counter />);
 - **@unblessed/core** - Widget library and terminal rendering
 - **@unblessed/layout** - Yoga flexbox layout engine
 - **react-reconciler** - React's custom renderer API
+
+### Widget Descriptor Pattern
+
+The implementation uses a **descriptor pattern** for type-safe widget configuration:
+
+```typescript
+// Each widget has a descriptor that encapsulates its behavior
+class BoxDescriptor extends WidgetDescriptor<BoxProps> {
+  get flexProps(); // Extract layout props for Yoga
+  get widgetOptions(); // Extract visual/behavioral props for unblessed
+  get eventHandlers(); // Extract event handlers
+  createWidget(); // Create unblessed widget instance
+  updateWidget(); // Update widget on re-render
+}
+```
+
+**Benefits:**
+
+- ✅ Type-safe props per widget type
+- ✅ No string-based type discrimination
+- ✅ Easy to extend with new widgets
+- ✅ Composition via helper functions (buildBorder, buildTextStyles, etc.)
 
 ### High-Level Flow
 
@@ -530,7 +579,7 @@ This separation allows:
 - **Event handling (onClick, onKeyPress, onSubmit, etc.)**
 - **Event cleanup on update/unmount**
 - **Content updates on state changes**
-- **12 tests passing (4 render + 6 event + 2 content update tests)**
+- **14 tests passing (4 render + 6 event + 2 content update + 2 text width tests)**
 
 **🚧 In Progress:**
 

@@ -10,7 +10,13 @@ export type {
   InteractiveWidgetProps,
   TextStyleProps,
 } from "./common-props.js";
-export { WidgetWithBordersDescriptor } from "./WidgetWithBordersDescriptor.js";
+export {
+  buildBorder,
+  buildFocusableOptions,
+  buildTextStyles,
+  mergeStyles,
+  prepareBorderStyle,
+} from "./helpers.js";
 
 // Re-export descriptors from components
 export { BigTextDescriptor, type BigTextProps } from "../components/BigText.js";

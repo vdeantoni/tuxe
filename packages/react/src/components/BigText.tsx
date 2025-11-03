@@ -2,11 +2,12 @@
  * BigText.tsx - BigText component and descriptor for @unblessed/react
  */
 
-import { BigText as BigTextWidget, colors, type Screen } from "@unblessed/core";
+import { BigText as BigTextWidget, type Screen } from "@unblessed/core";
 import type { ComputedLayout, FlexboxProps } from "@unblessed/layout";
 import { forwardRef, type PropsWithChildren } from "react";
 import { WidgetDescriptor } from "../widget-descriptors/base.js";
 import type { TextStyleProps } from "../widget-descriptors/common-props.js";
+import { buildTextStyles } from "../widget-descriptors/helpers.js";
 
 /**
  * Props interface for BigText component
@@ -41,25 +42,10 @@ export class BigTextDescriptor extends WidgetDescriptor<BigTextProps> {
     if (this.props.fch) options.fch = this.props.fch;
     if (this.props.content !== undefined) options.content = this.props.content;
 
-    // Build style object for text colors
-    if (
-      this.props.color ||
-      this.props.backgroundColor ||
-      this.props.bold ||
-      this.props.italic ||
-      this.props.underline
-    ) {
-      options.style = {};
-
-      if (this.props.color) {
-        options.style.fg = colors.convert(this.props.color);
-      }
-      if (this.props.backgroundColor) {
-        options.style.bg = colors.convert(this.props.backgroundColor);
-      }
-      if (this.props.bold) options.style.bold = true;
-      if (this.props.italic) options.style.italic = true;
-      if (this.props.underline) options.style.underline = true;
+    // Build text styles using helper function
+    const textStyles = buildTextStyles(this.props);
+    if (textStyles) {
+      options.style = textStyles;
     }
 
     return options;

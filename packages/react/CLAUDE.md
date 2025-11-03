@@ -25,10 +25,11 @@ const App = () => {
 
   return (
     <Box flexDirection="column" gap={2}>
-      <Box borderStyle="single" borderColor="cyan" padding={1}>
+      <Box border={1} borderStyle="single" borderColor="cyan" padding={1}>
         <Text>Count: {count}</Text>
       </Box>
       <Button
+        border={1}
         borderStyle="single"
         borderColor="green"
         padding={1}
@@ -50,6 +51,8 @@ Instead of imperative blessed-style code.
 ```
 React Components (<Box>, <Text>)
     ↓
+Widget Descriptors (encapsulate configuration)
+    ↓
 React Reconciler (creates/updates LayoutNodes)
     ↓
 @unblessed/layout (Yoga calculations)
@@ -59,34 +62,94 @@ unblessed widgets (positioned)
 Terminal rendering
 ```
 
+### Widget Descriptor Pattern
+
+The core architectural pattern is the **widget descriptor**. Each widget type has a descriptor class that encapsulates all its configuration logic:
+
+```typescript
+class BoxDescriptor extends WidgetDescriptor<BoxProps> {
+  // Extract layout props for Yoga
+  get flexProps(): FlexboxProps { ... }
+
+  // Extract visual/behavioral props for unblessed widget
+  get widgetOptions(): Record<string, any> { ... }
+
+  // Extract event handlers
+  get eventHandlers(): Record<string, Function> { ... }
+
+  // Create the unblessed widget instance
+  createWidget(layout: ComputedLayout, screen: Screen): Element { ... }
+
+  // Update widget on re-render
+  updateWidget(widget: Element, layout: ComputedLayout): void { ... }
+}
+```
+
+**Why descriptors?**
+
+- ✅ **Type safety** - Each widget has strongly typed props
+- ✅ **No string-based type discrimination** - Polymorphism instead of switch statements
+- ✅ **Single source of truth** - Descriptor owns complete widget lifecycle
+- ✅ **Composition** - Helper functions for shared logic (borders, text styles, focus)
+- ✅ **Easy to extend** - Create new descriptor class, register it, done
+
+**Composition via helpers:**
+
+Descriptors use helper functions to compose features without inheritance constraints:
+
+```typescript
+// Box needs borders + text styles
+get widgetOptions() {
+  const border = buildBorder(this.props);        // Helper function
+  const textStyles = buildTextStyles(this.props); // Helper function
+  const merged = mergeStyles(
+    prepareBorderStyle(border),
+    textStyles
+  );
+  return { border, style: merged, ... };
+}
+```
+
+This allows flexible composition - any widget can use any combination of helpers without needing complex inheritance hierarchies.
+
 ### Key Components
 
 **1. reconciler.ts** - React reconciler configuration
 
 - Handles React component lifecycle (create, update, delete)
-- Creates LayoutNodes via LayoutManager
+- Creates widget descriptors from React props
+- Creates LayoutNodes via LayoutManager using descriptor's extracted props
 - Triggers layout calculation on commit
 
-**2. dom.ts** - Virtual DOM
+**2. widget-descriptors/** - Descriptor infrastructure
+
+- base.ts - WidgetDescriptor abstract base class
+- helpers.ts - Composition helpers (buildBorder, buildTextStyles, buildFocusableOptions)
+- common-props.ts - Shared prop interfaces (BorderProps, TextStyleProps, etc.)
+- factory.ts - Descriptor registry and creation
+
+**3. dom.ts** - Virtual DOM
 
 - DOMNode wraps LayoutNode with React metadata
 - TextNode for text content
 - Tree manipulation (appendChild, removeChild, etc.)
 
-**3. render.ts** - Main render() function
+**4. render.ts** - Main render() function
 
 - Creates Screen and LayoutManager
 - Mounts React tree
 - Returns instance with unmount/rerender methods
 
-**4. Components**
+**5. components/** - Widget components and descriptors
 
-- Box.tsx - Container with flexbox props and event handlers
-- Text.tsx - Text with styling
-- Spacer.tsx - flexGrow={1} shorthand
-- Button.tsx - Interactive button with hover/focus effects
-- Input.tsx - Text input with submit/cancel events
-- BigText.tsx - Large ASCII art text
+Each component file contains both the descriptor class AND the React component:
+
+- Box.tsx - BoxDescriptor + Box component
+- Text.tsx - TextDescriptor + Text component
+- Spacer.tsx - SpacerDescriptor + Spacer component
+- Button.tsx - ButtonDescriptor + Button component
+- Input.tsx - InputDescriptor + Input component
+- BigText.tsx - BigTextDescriptor + BigText component
 
 ## Event Handling
 
@@ -226,6 +289,42 @@ To avoid conflicts with HTML elements, custom element names are used:
 Components (`<Button>`, `<Input>`) internally use these custom elements.
 
 ## Critical Learnings
+
+### Borders Require Yoga Awareness
+
+**CRITICAL:** Borders must include `border={1}` (or `borderTop={1}`, etc.) so that Yoga reserves space.
+
+**Problem:**
+
+```tsx
+// ❌ WRONG - borderStyle alone doesn't tell Yoga to reserve space
+<Box borderStyle="single" borderColor="cyan" padding={1}>
+  Content will overflow!
+</Box>
+```
+
+**Solution:**
+
+```tsx
+// ✅ CORRECT - border={1} tells Yoga to reserve 1 char on each side
+<Box border={1} borderStyle="single" borderColor="cyan" padding={1}>
+  Content fits properly
+</Box>
+```
+
+**Why:** Yoga needs to know about borders to calculate layout correctly. The `border` number tells Yoga "reserve this many characters", while `borderStyle` and `borderColor` are visual-only (passed to unblessed).
+
+**Implementation:** The `buildBorder()` helper in `helpers.ts` only creates a border object if border numbers are present:
+
+```typescript
+export function buildBorder(props) {
+  // Only create border if Yoga knows about it
+  if (!Number(props.border) && !Number(props.borderTop) && ...) {
+    return null;  // No border - prevents overlap
+  }
+  // ... build border
+}
+```
 
 ### Border Color Handling
 
@@ -369,47 +468,63 @@ packages/react/
 
 ## How Props Flow
 
-**React → Flexbox → Yoga:**
+**React → Descriptor → Flexbox → Yoga:**
 
 ```tsx
 <Box padding={1} border={1} borderColor="cyan">
 ```
 
-**Reconciler splits props:**
+**Step 1: Reconciler creates descriptor:**
 
 ```typescript
-// flexboxProps (for Yoga layout)
-{
+const descriptor = createDescriptor("box", props);
+// BoxDescriptor instance with typed props
+```
+
+**Step 2: Descriptor extracts props:**
+
+```typescript
+// flexProps (for Yoga layout)
+descriptor.flexProps = {
   padding: 1,
-  border: 1  // Tells Yoga to reserve space
-}
+  border: 1, // Tells Yoga to reserve space
+};
 
 // widgetOptions (for unblessed widget)
-{
+descriptor.widgetOptions = {
   border: {
     type: "line",
     style: "single",
-    fg: 6  // Cyan converted to number
+    fg: 6, // Cyan converted to number via buildBorder() helper
   },
   style: {
-    border: { fg: 6 }  // Pre-populate for unblessed
-  }
-}
+    border: { fg: 6 }, // Pre-populated via prepareBorderStyle() helper
+  },
+};
+
+// eventHandlers
+descriptor.eventHandlers = {
+  /* onClick, onKeyPress, etc. */
+};
 ```
 
-**LayoutManager:**
+**Step 3: LayoutManager:**
 
-- Creates LayoutNode with flexbox props
-- Stores widgetOptions for later
+- Creates LayoutNode with descriptor's flexbox props
+- Stores descriptor and widgetOptions on LayoutNode
 
-**Yoga calculates layout:**
+**Step 4: Yoga calculates layout:**
 
 - Accounts for border (1 char) in positioning
+- Calculates top, left, width, height for every node
 
-**widget-sync.ts:**
+**Step 5: widget-sync.ts:**
 
-- Creates widget with Yoga coordinates + widgetOptions
-- Spreads widgetOptions into widget constructor
+- Calls `descriptor.createWidget(layout, screen)` to create unblessed widget
+- Widget has Yoga coordinates + descriptor's widgetOptions
+- Binds event handlers from descriptor
+
+**Key insight:** Descriptor acts as the adapter between React props and unblessed widgets, handling all the prop splitting and conversion logic.
 
 ## Current State
 
@@ -424,7 +539,9 @@ packages/react/
 - **Event cleanup on update/unmount**
 - **Handler rebinding on prop changes**
 - **Content updates on state changes (text concatenation)**
-- 12 tests passing (4 render + 6 event + 2 content update tests)
+- **Widget descriptor pattern for type-safe configuration**
+- **Composition via helper functions (borders, text styles, focus)**
+- 14 tests passing (4 render + 6 event + 2 content update + 2 text width tests)
 
 **📋 TODO:**
 

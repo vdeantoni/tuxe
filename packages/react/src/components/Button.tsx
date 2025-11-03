@@ -6,8 +6,13 @@ import { Button as ButtonWidget, type Screen } from "@unblessed/core";
 import type { ComputedLayout, FlexboxProps } from "@unblessed/layout";
 import type { ReactNode } from "react";
 import { forwardRef, type PropsWithChildren } from "react";
+import { WidgetDescriptor } from "../widget-descriptors/base.js";
 import type { InteractiveWidgetProps } from "../widget-descriptors/common-props.js";
-import { WidgetWithBordersDescriptor } from "../widget-descriptors/WidgetWithBordersDescriptor.js";
+import {
+  buildBorder,
+  buildFocusableOptions,
+  prepareBorderStyle,
+} from "../widget-descriptors/helpers.js";
 
 /**
  * Props interface for Button component
@@ -23,7 +28,7 @@ export interface ButtonProps extends InteractiveWidgetProps {
 /**
  * Descriptor for Button widgets
  */
-export class ButtonDescriptor extends WidgetWithBordersDescriptor<ButtonProps> {
+export class ButtonDescriptor extends WidgetDescriptor<ButtonProps> {
   readonly type = "button";
 
   get flexProps(): FlexboxProps {
@@ -39,13 +44,16 @@ export class ButtonDescriptor extends WidgetWithBordersDescriptor<ButtonProps> {
   get widgetOptions() {
     const options: any = {};
 
-    // Build border from inherited BorderProps
-    const border = this.buildBorder();
+    // Build border using helper function
+    const border = buildBorder(this.props);
     if (border) {
       options.border = border;
       // Pre-populate style.border.fg
-      options.style = this.prepareBorderStyle(border);
+      options.style = prepareBorderStyle(border);
     }
+
+    // Build focusable options using helper function
+    Object.assign(options, buildFocusableOptions(this.props, 0));
 
     // Button-specific options
     if (this.props.hoverBg) options.hoverBg = this.props.hoverBg;
@@ -53,14 +61,6 @@ export class ButtonDescriptor extends WidgetWithBordersDescriptor<ButtonProps> {
       options.focusEffects = { border: { fg: this.props.focusBg } };
     }
     if (this.props.content !== undefined) options.content = this.props.content;
-
-    // Focusable options (inherited from FocusableProps)
-    // Default tabIndex = 0 for buttons
-    options.tabIndex =
-      this.props.tabIndex !== undefined ? this.props.tabIndex : 0;
-    if (this.props.autoFocus !== undefined) {
-      options.autoFocus = this.props.autoFocus;
-    }
 
     return options;
   }
