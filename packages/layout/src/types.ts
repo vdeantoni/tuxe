@@ -4,6 +4,7 @@
 
 import type { Element, Screen } from "@unblessed/core";
 import type { Node as YogaNode } from "yoga-layout";
+import { WidgetDescriptor } from "./widget-descriptor";
 
 /**
  * Flexbox style properties supported by the layout engine.
@@ -269,11 +270,10 @@ export interface LayoutNode {
   _boundHandlers?: Record<string, Function>;
 
   /**
-   * Widget descriptor instance (from @unblessed/react).
+   * Widget descriptor instance
    * This encapsulates all widget configuration and creation logic.
-   * Using `any` to avoid circular dependency.
    */
-  _descriptor?: any;
+  _descriptor?: WidgetDescriptor;
 }
 
 /**

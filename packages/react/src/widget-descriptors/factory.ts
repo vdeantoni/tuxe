@@ -5,13 +5,14 @@
  * from React props.
  */
 
+import { WidgetDescriptor } from "@unblessed/layout";
 import { BigTextDescriptor } from "../components/BigText.js";
 import { BoxDescriptor } from "../components/Box.js";
 import { ButtonDescriptor } from "../components/Button.js";
 import { InputDescriptor } from "../components/Input.js";
+import { ListDescriptor } from "../components/List.js";
 import { SpacerDescriptor } from "../components/Spacer.js";
 import { TextDescriptor } from "../components/Text.js";
-import { WidgetDescriptor } from "./base.js";
 
 /**
  * Registry mapping type strings to descriptor class constructors
@@ -28,6 +29,7 @@ const descriptorRegistry = new Map<
   ["textinput", InputDescriptor], // Alias to avoid conflict with HTML <input>
   ["bigtext", BigTextDescriptor],
   ["spacer", SpacerDescriptor],
+  ["list", ListDescriptor],
 ]);
 
 /**

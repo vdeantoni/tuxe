@@ -49,6 +49,7 @@ export type {
   LayoutManagerOptions,
   LayoutNode,
 } from "./types.js";
+export { WidgetDescriptor } from "./widget-descriptor.js";
 export {
   destroyWidgets,
   getComputedLayout,

@@ -12,7 +12,7 @@ import { BigText, Box, render, Text } from "../dist/index.js";
 // WORKAROUND: In development, ensure runtime is initialized for source files too
 import { initCore } from "@unblessed/core";
 import { NodeRuntime } from "@unblessed/node";
-import { Spacer } from "../src";
+import { List, Spacer } from "../src";
 import { Button } from "../src/components/Button";
 import { Input } from "../src/components/Input";
 initCore(new NodeRuntime());
@@ -21,16 +21,9 @@ const screen = new Screen({ smartCSR: true, fullUnicode: true });
 
 const App = () => (
   <Box flexDirection="column" padding={1} gap={1}>
-    <BigText>UNBLESSED</BigText>
+    <BigText char="U">UNBLESSED</BigText>
 
-    <Box
-      flexDirection="column"
-      padding={1}
-      border={1}
-      borderStyle="single"
-      borderColor="cyan"
-      gap={1}
-    >
+    <Box flexDirection="column" padding={1} border={1} gap={1}>
       <Input borderColor="blue" />
       <Text>@unblessed/react Border Showcase</Text>
     </Box>
@@ -40,9 +33,8 @@ const App = () => (
       <Box
         width={18}
         border={1}
-        borderStyle="single"
-        borderColor="green"
         padding={1}
+        hover={{ border: { color: "green", dim: true } }}
       >
         <Text>Single</Text>
       </Box>
@@ -80,7 +72,6 @@ const App = () => (
       <Box
         flexGrow={1}
         border={1}
-        borderStyle="single"
         borderTopColor="red"
         borderBottomColor="blue"
         borderLeftColor="green"
@@ -104,8 +95,8 @@ const App = () => (
 
     {/* Flexbox with borders and spacer */}
     <Box flexDirection="row" gap={1}>
-      <Box width={20} border={1} borderStyle="single" borderColor="blue">
-        <Button hoverBg="red" focusBg="yellow">
+      <Box width={20} border={1} borderColor="blue">
+        <Button hover={{ bg: "red" }} focus={{ border: { fg: "yellow" } }}>
           {"{center}LEFT{/center}"}
         </Button>
       </Box>
@@ -119,7 +110,7 @@ const App = () => (
         borderStyle="single"
         borderColor="blue"
       >
-        <Input borderStyle="classic" />
+        <List label="This is rad!" items={["Oi", "Tchau"]} height={10} />
       </Box>
     </Box>
 
@@ -132,7 +123,13 @@ const App = () => (
 
     {/* Footer */}
     <Spacer />
-    <Box border={1} borderStyle="single" borderTopColor="gray" padding={1}>
+    <Box
+      border={1}
+      borderStyle="single"
+      borderBottomColor="gray"
+      borderRightColor="gray"
+      padding={1}
+    >
       <Text color="gray" dim>
         Press q or Ctrl+C to quit
       </Text>

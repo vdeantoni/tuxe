@@ -3,17 +3,17 @@
  */
 
 import { type Screen, Text as TextWidget } from "@unblessed/core";
-import type { ComputedLayout } from "@unblessed/layout";
+import { ComputedLayout, WidgetDescriptor } from "@unblessed/layout";
 import type { ReactNode } from "react";
 import { forwardRef, type PropsWithChildren } from "react";
-import { WidgetDescriptor } from "../widget-descriptors/base.js";
-import type { TextStyleProps } from "../widget-descriptors/common-props.js";
+import type { StyleObject } from "../widget-descriptors/common-props.js";
 import { buildTextStyles } from "../widget-descriptors/helpers.js";
+import { COMMON_WIDGET_OPTIONS } from "./Box";
 
 /**
  * Props interface for Text component
  */
-export interface TextProps extends TextStyleProps {
+export interface TextProps extends StyleObject {
   content?: string;
   children?: ReactNode;
 }
@@ -55,6 +55,7 @@ export class TextDescriptor extends WidgetDescriptor<TextProps> {
   createWidget(layout: ComputedLayout, screen: Screen): TextWidget {
     return new TextWidget({
       screen,
+      ...COMMON_WIDGET_OPTIONS,
       top: layout.top,
       left: layout.left,
       width: layout.width,

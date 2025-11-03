@@ -14,7 +14,7 @@
  */
 
 import type { Element, Screen } from "@unblessed/core";
-import type { ComputedLayout, FlexboxProps } from "@unblessed/layout";
+import { ComputedLayout, FlexboxProps } from "./types";
 
 /**
  * Base class for all widget descriptors.
@@ -58,7 +58,6 @@ export abstract class WidgetDescriptor<TProps = any> {
 
   /**
    * Extract event handlers from props.
-   * Maps React-style event props (onClick, onKeyPress) to unblessed event names.
    *
    * @returns Map of event name → handler function
    */
@@ -76,14 +75,12 @@ export abstract class WidgetDescriptor<TProps = any> {
 
   /**
    * Update an existing widget with new layout and options.
-   * Called when React re-renders with changed props or layout changes.
    *
    * @param widget - Existing widget instance to update
    * @param layout - New computed layout from Yoga (with border adjustments already applied)
    */
   updateWidget(widget: Element, layout: ComputedLayout): void {
     // Update position
-    // Note: layout already has border adjustments applied from widget-sync
     widget.position.top = layout.top;
     widget.position.left = layout.left;
     widget.position.width = layout.width;
@@ -91,15 +88,5 @@ export abstract class WidgetDescriptor<TProps = any> {
 
     // Update widget options
     Object.assign(widget, this.widgetOptions);
-  }
-
-  /**
-   * Update widget with new props.
-   * Called when React re-renders with changed props.
-   *
-   * @param newProps - New props from React
-   */
-  updateProps(newProps: TProps): void {
-    this.props = newProps;
   }
 }

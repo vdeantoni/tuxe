@@ -3,24 +3,29 @@
  */
 
 import { Button as ButtonWidget, type Screen } from "@unblessed/core";
-import type { ComputedLayout, FlexboxProps } from "@unblessed/layout";
+import {
+  ComputedLayout,
+  FlexboxProps,
+  WidgetDescriptor,
+} from "@unblessed/layout";
 import type { ReactNode } from "react";
 import { forwardRef, type PropsWithChildren } from "react";
-import { WidgetDescriptor } from "../widget-descriptors/base.js";
 import type { InteractiveWidgetProps } from "../widget-descriptors/common-props.js";
 import {
   buildBorder,
   buildFocusableOptions,
+  buildStyleObject,
+  extractStyleProps,
+  mergeStyles,
   prepareBorderStyle,
 } from "../widget-descriptors/helpers.js";
+import { COMMON_WIDGET_OPTIONS } from "./Box";
 
 /**
  * Props interface for Button component
- * Inherits all interactive widget properties (layout, events, focus, borders)
+ * Inherits all interactive widget properties (layout, events, focus, borders, styling)
  */
 export interface ButtonProps extends InteractiveWidgetProps {
-  hoverBg?: string;
-  focusBg?: string;
   content?: string;
   children?: ReactNode;
 }
@@ -50,16 +55,37 @@ export class ButtonDescriptor extends WidgetDescriptor<ButtonProps> {
       options.border = border;
       // Pre-populate style.border.fg
       options.style = prepareBorderStyle(border);
+    } else {
+      options.style = {};
+    }
+
+    // Ensure style.border exists if hover/focus have border effects
+    // This prevents errors when setEffects tries to save original border values
+    if (this.props.hover?.border || this.props.focus?.border) {
+      options.style.border = options.style.border || {};
     }
 
     // Build focusable options using helper function
     Object.assign(options, buildFocusableOptions(this.props, 0));
 
-    // Button-specific options
-    if (this.props.hoverBg) options.hoverBg = this.props.hoverBg;
-    if (this.props.focusBg) {
-      options.focusEffects = { border: { fg: this.props.focusBg } };
+    // Base/default state styling from direct props
+    const defaultStyle = extractStyleProps(this.props);
+    const baseStyle = buildStyleObject(defaultStyle);
+    if (Object.keys(baseStyle).length > 0) {
+      options.style = mergeStyles(options.style, baseStyle);
     }
+
+    // Hover effects
+    if (this.props.hover) {
+      options.hoverEffects = buildStyleObject(this.props.hover);
+    }
+
+    // Focus effects
+    if (this.props.focus) {
+      options.focusEffects = buildStyleObject(this.props.focus);
+    }
+
+    // Button-specific options
     if (this.props.content !== undefined) options.content = this.props.content;
 
     return options;
@@ -78,10 +104,7 @@ export class ButtonDescriptor extends WidgetDescriptor<ButtonProps> {
   createWidget(layout: ComputedLayout, screen: Screen): ButtonWidget {
     return new ButtonWidget({
       screen,
-      tags: true,
-      mouse: true,
-      keys: true,
-      inputOnFocus: true,
+      ...COMMON_WIDGET_OPTIONS,
       top: layout.top,
       left: layout.left,
       width: layout.width,
@@ -96,6 +119,9 @@ export class ButtonDescriptor extends WidgetDescriptor<ButtonProps> {
  *
  * Supports mouse clicks, keyboard press (Enter), and visual state changes.
  * Automatically receives focus when tabbed to.
+ *
+ * Default state styling uses direct props (color, bg, bold, etc.)
+ * State variations use nested objects (hover, focus)
  *
  * @example Basic button
  * ```tsx
@@ -114,8 +140,11 @@ export class ButtonDescriptor extends WidgetDescriptor<ButtonProps> {
  * <Button
  *   borderStyle="single"
  *   borderColor="blue"
- *   hoverBg="blue"
- *   focusBg="cyan"
+ *   color="white"
+ *   bg="blue"
+ *   bold={true}
+ *   hover={{ bg: "darkblue" }}
+ *   focus={{ border: { color: "cyan" } }}
  *   padding={1}
  *   onPress={() => handleSubmit()}
  * >
@@ -135,7 +164,7 @@ export class ButtonDescriptor extends WidgetDescriptor<ButtonProps> {
 export const Button = forwardRef<any, PropsWithChildren<ButtonProps>>(
   ({ children, ...props }, ref) => {
     return (
-      <tbutton ref={ref} border={1} {...props}>
+      <tbutton ref={ref} border={1} minHeight={3} {...props}>
         {children}
       </tbutton>
     );

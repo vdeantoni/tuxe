@@ -191,7 +191,6 @@ const InteractiveDemo = () => {
         <Input
           border={1}
           borderColor="cyan"
-          autoFocus
           onSubmit={(value) => {
             setMessage(value || "");
           }}

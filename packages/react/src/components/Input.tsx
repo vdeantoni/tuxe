@@ -3,22 +3,32 @@
  */
 
 import { type Screen, Textbox } from "@unblessed/core";
-import type { ComputedLayout, FlexboxProps } from "@unblessed/layout";
+import {
+  ComputedLayout,
+  FlexboxProps,
+  WidgetDescriptor,
+} from "@unblessed/layout";
 import { forwardRef } from "react";
-import { WidgetDescriptor } from "../widget-descriptors/base.js";
 import type { InteractiveWidgetProps } from "../widget-descriptors/common-props.js";
 import {
   buildBorder,
   buildFocusableOptions,
+  buildStyleObject,
+  extractStyleProps,
+  mergeStyles,
   prepareBorderStyle,
 } from "../widget-descriptors/helpers.js";
+import { COMMON_WIDGET_OPTIONS } from "./Box";
 
 /**
  * Props interface for Input component
  * Inherits all interactive widget properties (layout, events, focus, borders)
  */
 export interface InputProps extends InteractiveWidgetProps {
+  /** Controlled value - when provided, input becomes controlled */
   value?: string;
+  /** Default value for uncontrolled mode */
+  defaultValue?: string;
 }
 
 /**
@@ -57,11 +67,40 @@ export class InputDescriptor extends WidgetDescriptor<InputProps> {
       options.style.fg = 7; // White/default terminal foreground
     }
 
+    // Ensure style.border exists if hover/focus have border effects
+    // This prevents errors when setEffects tries to save original border values
+    if (this.props.hover?.border || this.props.focus?.border) {
+      options.style.border = options.style.border || {};
+    }
+
     // Build focusable options using helper function
     Object.assign(options, buildFocusableOptions(this.props, 0));
 
-    // Input-specific options
-    if (this.props.value !== undefined) options.value = this.props.value;
+    // Base/default state styling from direct props
+    const defaultStyle = extractStyleProps(this.props);
+    const baseStyle = buildStyleObject(defaultStyle);
+    if (Object.keys(baseStyle).length > 0) {
+      options.style = mergeStyles(options.style, baseStyle);
+    }
+
+    // Hover effects
+    if (this.props.hover) {
+      options.hoverEffects = buildStyleObject(this.props.hover);
+    }
+
+    // Focus effects
+    if (this.props.focus) {
+      options.focusEffects = buildStyleObject(this.props.focus);
+    }
+
+    // Input value: controlled (value) or uncontrolled (defaultValue)
+    // In controlled mode, value is managed externally
+    // In uncontrolled mode, defaultValue sets initial value only
+    if (this.props.value !== undefined) {
+      options.value = this.props.value;
+    } else if (this.props.defaultValue !== undefined) {
+      options.value = this.props.defaultValue;
+    }
 
     return options;
   }
@@ -79,9 +118,7 @@ export class InputDescriptor extends WidgetDescriptor<InputProps> {
   createWidget(layout: ComputedLayout, screen: Screen): Textbox {
     return new Textbox({
       screen,
-      tags: true,
-      mouse: true,
-      keys: true,
+      ...COMMON_WIDGET_OPTIONS,
       inputOnFocus: true,
       top: layout.top,
       left: layout.left,
@@ -89,6 +126,17 @@ export class InputDescriptor extends WidgetDescriptor<InputProps> {
       height: layout.height,
       ...this.widgetOptions,
     });
+  }
+
+  override updateWidget(widget: Textbox, layout: ComputedLayout): void {
+    // Call base implementation for position and options update
+    super.updateWidget(widget, layout);
+
+    // Input-specific: Update value in controlled mode
+    // Only update if value is explicitly provided (controlled mode)
+    if (this.props.value !== undefined) {
+      widget.setValue(this.props.value);
+    }
   }
 }
 
@@ -99,20 +147,44 @@ export class InputDescriptor extends WidgetDescriptor<InputProps> {
  * Users can type text and submit with Enter or cancel with Escape.
  * Automatically receives focus when tabbed to (tabIndex=0 by default).
  *
- * @example Basic input
+ * Supports both controlled and uncontrolled modes:
+ * - Controlled: Provide `value` prop and update it via events
+ * - Uncontrolled: Use `defaultValue` for initial value, or omit for empty input
+ *
+ * Default state styling uses direct props (color, bg, bold, etc.)
+ * State variations use nested objects (hover, focus)
+ *
+ * @example Uncontrolled input (with default value)
  * ```tsx
  * <Input
  *   width={30}
+ *   defaultValue="Initial text"
+ *   color="white"
+ *   focus={{ border: { color: "cyan" } }}
  *   onSubmit={(value) => console.log('Submitted:', value)}
  *   onCancel={() => console.log('Cancelled')}
  * />
  * ```
  *
- * @example With auto-focus
+ * @example Controlled input
+ * ```tsx
+ * const [text, setText] = useState('');
+ * <Input
+ *   width={40}
+ *   value={text}
+ *   onChange={(newValue) => setText(newValue)}
+ *   onSubmit={(value) => handleSubmit(value)}
+ * />
+ * ```
+ *
+ * @example With auto-focus and styling
  * ```tsx
  * <Input
  *   width={40}
- *   autoFocus={true}
+ *   defaultValue="Focus me!"
+ *   color="white"
+ *   bg="blue"
+ *   focus={{ border: { color: "cyan" }, bg: "darkblue" }}
  *   onSubmit={(value) => handleSubmit(value)}
  * />
  * ```

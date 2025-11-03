@@ -155,7 +155,6 @@ screen.render();
 
 - Enable `mouse: true` in Screen options for click/hover events
 - Enable `keys: true` for keyboard event handling
-- Use `autoFocus` on Input components for immediate typing
 - Always provide a way to exit (Ctrl+C handler)
 - Use React state hooks for interactive UIs
 - Check `screen.width` and `screen.height` for responsive layouts

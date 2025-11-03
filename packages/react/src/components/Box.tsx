@@ -3,32 +3,41 @@
  */
 
 import { Box as BoxWidget, type Screen } from "@unblessed/core";
-import type { ComputedLayout, FlexboxProps } from "@unblessed/layout";
+import {
+  ComputedLayout,
+  FlexboxProps,
+  WidgetDescriptor,
+} from "@unblessed/layout";
 import type { ReactNode } from "react";
 import { forwardRef, type PropsWithChildren } from "react";
-import type { ReactEventProps } from "../types.js";
-import { WidgetDescriptor } from "../widget-descriptors/base.js";
-import type {
-  BorderProps,
-  TextStyleProps,
-} from "../widget-descriptors/common-props.js";
+import type { InteractiveWidgetProps } from "../widget-descriptors/common-props.js";
 import {
   buildBorder,
-  buildTextStyles,
+  buildFocusableOptions,
+  buildStyleObject,
+  extractStyleProps,
   mergeStyles,
   prepareBorderStyle,
 } from "../widget-descriptors/helpers.js";
 
+export const COMMON_WIDGET_OPTIONS = {
+  tags: true,
+  mouse: true,
+  keys: true,
+};
+
 /**
  * Props interface for Box component
  * Combines flexbox layout props with box-specific visual properties
+ *
+ * Inherits all interactive widget properties including:
+ * - Layout (flexbox, width, height, padding, margin, etc.)
+ * - Events (onClick, onKeyPress, onFocus, etc.)
+ * - Styling (color, bg, bold, etc.)
+ * - State styling (hover, focus)
+ * - Borders (borderStyle, borderColor, etc.)
  */
-export interface BoxProps
-  extends FlexboxProps,
-    ReactEventProps,
-    BorderProps,
-    TextStyleProps {
-  tabIndex?: number;
+export interface BoxProps extends InteractiveWidgetProps {
   tags?: boolean;
   content?: string;
   children?: ReactNode;
@@ -37,8 +46,8 @@ export interface BoxProps
 /**
  * Descriptor for Box widgets
  */
-export class BoxDescriptor extends WidgetDescriptor<BoxProps> {
-  readonly type = "box";
+export class BoxDescriptor<T extends BoxProps> extends WidgetDescriptor<T> {
+  readonly type: string = "box";
 
   get flexProps(): FlexboxProps {
     // Extract all flexbox-related properties
@@ -108,7 +117,7 @@ export class BoxDescriptor extends WidgetDescriptor<BoxProps> {
     if (paddingBottom !== undefined) flexboxProps.paddingBottom = paddingBottom;
     if (paddingLeft !== undefined) flexboxProps.paddingLeft = paddingLeft;
     if (paddingRight !== undefined) flexboxProps.paddingRight = paddingRight;
-    if (border !== undefined) flexboxProps.border = border;
+    if (border !== undefined) flexboxProps.border = border ? 1 : 0;
     if (borderTop !== undefined) flexboxProps.borderTop = borderTop;
     if (borderBottom !== undefined) flexboxProps.borderBottom = borderBottom;
     if (borderLeft !== undefined) flexboxProps.borderLeft = borderLeft;
@@ -136,15 +145,37 @@ export class BoxDescriptor extends WidgetDescriptor<BoxProps> {
     const border = buildBorder(this.props);
     if (border) {
       widgetOptions.border = border;
+      // Pre-populate style.border.fg
+      widgetOptions.style = prepareBorderStyle(border);
+    } else {
+      widgetOptions.style = {};
     }
 
-    // Build text styles using helper function
-    const textStyles = buildTextStyles(this.props);
+    // Ensure style.border exists if hover/focus have border effects
+    // This prevents errors when setEffects tries to save original border values
+    if (this.props.hover?.border || this.props.focus?.border) {
+      widgetOptions.style.border = widgetOptions.style.border || {};
+    }
 
-    // Merge border style and text styles
-    const mergedStyles = mergeStyles(prepareBorderStyle(border), textStyles);
-    if (mergedStyles) {
-      widgetOptions.style = mergedStyles;
+    // Build focusable options using helper function
+    // Box is not focusable by default (no defaultTabIndex)
+    Object.assign(widgetOptions, buildFocusableOptions(this.props));
+
+    // Base/default state styling from direct props
+    const defaultStyle = extractStyleProps(this.props);
+    const baseStyle = buildStyleObject(defaultStyle);
+    if (Object.keys(baseStyle).length > 0) {
+      widgetOptions.style = mergeStyles(widgetOptions.style, baseStyle);
+    }
+
+    // Hover effects
+    if (this.props.hover) {
+      widgetOptions.hoverEffects = buildStyleObject(this.props.hover);
+    }
+
+    // Focus effects
+    if (this.props.focus) {
+      widgetOptions.focusEffects = buildStyleObject(this.props.focus);
     }
 
     // Content
@@ -155,11 +186,6 @@ export class BoxDescriptor extends WidgetDescriptor<BoxProps> {
     // Tags
     if (this.props.tags !== undefined) {
       widgetOptions.tags = this.props.tags;
-    }
-
-    // Tab index
-    if (this.props.tabIndex !== undefined) {
-      widgetOptions.tabIndex = this.props.tabIndex;
     }
 
     return widgetOptions;
@@ -192,9 +218,7 @@ export class BoxDescriptor extends WidgetDescriptor<BoxProps> {
   createWidget(layout: ComputedLayout, screen: Screen): BoxWidget {
     return new BoxWidget({
       screen,
-      tags: true,
-      mouse: true,
-      keys: true,
+      ...COMMON_WIDGET_OPTIONS,
       top: layout.top,
       left: layout.left,
       width: layout.width,
@@ -207,7 +231,9 @@ export class BoxDescriptor extends WidgetDescriptor<BoxProps> {
 /**
  * Box component - Container with flexbox layout support
  *
- * Supports flexbox properties, borders, colors, and event handling.
+ * Supports flexbox properties, borders, colors, event handling, and state styling.
+ * Default state styling uses direct props (color, bg, bold, etc.)
+ * State variations use nested objects (hover, focus)
  *
  * @example Basic layout
  * ```tsx
@@ -215,6 +241,7 @@ export class BoxDescriptor extends WidgetDescriptor<BoxProps> {
  *   flexDirection="row"
  *   gap={2}
  *   padding={1}
+ *   border={1}
  *   borderStyle="single"
  *   borderColor="cyan"
  * >
@@ -224,17 +251,34 @@ export class BoxDescriptor extends WidgetDescriptor<BoxProps> {
  * </Box>
  * ```
  *
+ * @example With styling and state effects
+ * ```tsx
+ * <Box
+ *   padding={1}
+ *   border={1}
+ *   borderStyle="single"
+ *   borderColor="white"
+ *   color="gray"
+ *   hover={{ border: { color: "cyan" }, color: "white" }}
+ *   focus={{ border: { color: "yellow" } }}
+ * >
+ *   Interactive Box
+ * </Box>
+ * ```
+ *
  * @example With event handling
  * ```tsx
  * <Box
  *   padding={1}
+ *   border={1}
  *   borderStyle="single"
+ *   tabIndex={0}
  *   onClick={(data) => console.log('Clicked!', data)}
  *   onKeyPress={(ch, key) => {
  *     if (key.name === 'enter') handleSubmit();
  *   }}
  * >
- *   Interactive Box
+ *   Click or press Enter
  * </Box>
  * ```
  */

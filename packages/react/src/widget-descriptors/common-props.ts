@@ -17,12 +17,6 @@ export interface FocusableProps {
    * @default 0 for interactive widgets
    */
   tabIndex?: number;
-
-  /**
-   * Whether this widget should receive focus on mount
-   * @default false
-   */
-  autoFocus?: boolean;
 }
 
 /**
@@ -44,24 +38,71 @@ export interface BorderProps {
 
 /**
  * Props for interactive widgets (buttons, inputs, etc.)
- * Combines layout, events, and focus behavior
+ * Combines layout, events, focus behavior, and styling
+ * Default state style properties are direct props (inherited from StyleObject)
+ * State variations use nested objects (hover, focus)
  */
 export interface InteractiveWidgetProps
   extends FlexboxProps,
     ReactEventProps,
     FocusableProps,
-    BorderProps {}
+    BorderProps,
+    Omit<StyleObject, "border"> {
+  hover?: StyleObject;
+  focus?: StyleObject;
+}
 
 /**
- * Props for text styling
+ * Border state styling object
+ * Used for styling borders in different states (hover, focus, etc.)
  */
-export interface TextStyleProps {
-  color?: string;
-  backgroundColor?: string;
+export interface BorderStyleObject {
+  // Primary names
+  color?: string; // Border line color (maps to fg in unblessed)
+  backgroundColor?: string; // Border background color (maps to bg)
+
+  // Shorthands
+  fg?: string; // Shorthand for color
+  bg?: string; // Shorthand for backgroundColor
+  background?: string; // Alternative shorthand for backgroundColor
+
+  // Per-side colors
+  topColor?: string;
+  bottomColor?: string;
+  leftColor?: string;
+  rightColor?: string;
+
+  // Dim properties
+  dim?: boolean;
+  topDim?: boolean;
+  bottomDim?: boolean;
+  leftDim?: boolean;
+  rightDim?: boolean;
+}
+
+/**
+ * Complete style object for widget state styling
+ * Supports both primary names and shorthands (like CSS)
+ */
+export interface StyleObject {
+  // Primary names
+  color?: string; // Text color
+  backgroundColor?: string; // Background color
+
+  // Shorthands
+  fg?: string; // Shorthand for color
+  bg?: string; // Shorthand for backgroundColor
+  background?: string; // Alternative shorthand for backgroundColor
+
+  // Text styles
   bold?: boolean;
   italic?: boolean;
   underline?: boolean;
   strikethrough?: boolean;
-  inverse?: boolean;
+  reverse?: boolean;
   dim?: boolean;
+  blink?: boolean;
+  hide?: boolean;
+
+  border?: BorderStyleObject;
 }

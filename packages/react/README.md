@@ -183,7 +183,6 @@ Interactive button component with hover and focus effects.
 - `onClick` - Click handler
 - `onPress` - Press handler (Enter key or click)
 - `tabIndex` - Focus order (default: 0)
-- `autoFocus` - Auto-focus on mount
 
 **Note:** Inherits all interactive properties including borders, events, and focus management.
 
@@ -197,7 +196,6 @@ Text input component for user interaction.
   borderStyle="single"
   borderColor="blue"
   height={3}
-  autoFocus
   onSubmit={(value) => console.log("Submitted:", value)}
   onCancel={() => console.log("Cancelled")}
 />
@@ -206,7 +204,6 @@ Text input component for user interaction.
 **Props:**
 
 - All Box props (flexbox, border, colors, events, etc.)
-- `autoFocus` - Automatically focus on mount
 - `value` - Input value
 - `onSubmit` - Submit handler (Enter key)
 - `onCancel` - Cancel handler (Escape key)
@@ -270,7 +267,7 @@ const LoginForm = () => (
 
     <Box flexDirection="column" gap={1}>
       <Text>Username:</Text>
-      <Input border={1} borderColor="blue" autoFocus />
+      <Input border={1} borderColor="blue" />
 
       <Text>Password:</Text>
       <Input border={1} borderColor="blue" />

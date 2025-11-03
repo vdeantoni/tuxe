@@ -8,6 +8,7 @@ import type { BigTextProps } from "./components/BigText.js";
 import type { BoxProps } from "./components/Box.js";
 import type { ButtonProps } from "./components/Button.js";
 import type { InputProps } from "./components/Input.js";
+import type { ListProps } from "./components/List.js";
 import type { SpacerProps } from "./components/Spacer.js";
 import type { TextProps } from "./components/Text.js";
 
@@ -20,6 +21,7 @@ declare global {
       tbutton: ButtonProps & { ref?: any }; // Use 'tbutton' to avoid conflict with HTML button
       textinput: InputProps & { ref?: any }; // Use 'textinput' to avoid conflict with HTML input
       spacer: SpacerProps & { ref?: any };
+      list: ListProps & { ref?: any };
       root: any;
     }
   }
