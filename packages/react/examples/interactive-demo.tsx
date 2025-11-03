@@ -13,11 +13,7 @@
 import { NodeRuntime, Screen } from "@unblessed/node";
 import React, { useState } from "react";
 
-// WORKAROUND: In development, ensure runtime is initialized for source files too
-import { setRuntime } from "@unblessed/core";
 import { BigText, Box, Button, Input, render, Text } from "../src/index.js";
-
-setRuntime(new NodeRuntime());
 
 const InteractiveDemo = () => {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -40,11 +36,14 @@ const InteractiveDemo = () => {
 
       {/* Mouse Tracking Panel */}
       <Box
+        tabIndex={0}
         flexDirection="column"
         border={1}
         borderStyle="single"
         borderColor="green"
         padding={1}
+        focus={{ bg: "blue" }}
+        hover={{ bg: "red" }}
         onMouseMove={(data) => setMousePos({ x: data.x, y: data.y })}
         onClick={(data) => {
           setLastClick({ x: data.x, y: data.y });
@@ -115,7 +114,7 @@ const InteractiveDemo = () => {
               height={3}
               border={1}
               borderColor="red"
-              hoverBg="red"
+              hover={{ bg: "red" }}
               onPress={() => setClickCount((c) => Math.max(0, c - 1))}
             >
               {"{center}-{/center}"}
@@ -135,7 +134,7 @@ const InteractiveDemo = () => {
               height={3}
               border={1}
               borderColor="green"
-              hoverBg="green"
+              hover={{ bg: "green" }}
               onPress={() => setClickCount((c) => c + 1)}
             >
               {"{center}+{/center}"}
@@ -163,15 +162,15 @@ const InteractiveDemo = () => {
             border={1}
             borderStyle="single"
             borderColor="white"
+            hover={{ bg: "magenta" }}
+            focus={{ bg: "green" }}
             onKeyPress={(ch, key) => {
               setLastKey(key.full || ch);
             }}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
           >
-            <Text>
-              {isFocused ? "🟢 Focused - Type!" : "⚪ Click to focus"}
-            </Text>
+            {isFocused ? "🟢 Focused - Type!" : "⚪ Click to focus"}
           </Box>
         </Box>
       </Box>
@@ -238,7 +237,7 @@ screen.key(["C-c"], () => {
 });
 
 // Render the app
-render(<InteractiveDemo />, { screen, debug: false });
+render(<InteractiveDemo />, { runtime: new NodeRuntime(), debug: false });
 
 // Initial render
 screen.render();

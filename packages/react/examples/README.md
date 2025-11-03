@@ -106,29 +106,13 @@ A simple game demonstrating keyboard event handling:
 
 ## Development
 
-When developing examples, the runtime needs to be initialized due to monorepo source/dist issues:
-
-```tsx
-// WORKAROUND: In development
-import { setRuntime } from "@unblessed/core";
-import { NodeRuntime } from "@unblessed/node";
-setRuntime(new NodeRuntime());
-```
-
-This is automatically added by the linter and won't be needed when packages are published to npm.
-
 ## Creating New Examples
 
 Template:
 
 ```tsx
-import { Screen } from "@unblessed/node";
-import { render, Box, Text } from "../src/index.js";
-
-// WORKAROUND for development
-import { setRuntime } from "@unblessed/core";
 import { NodeRuntime } from "@unblessed/node";
-setRuntime(new NodeRuntime());
+import { render, Box, Text } from "../src/index.js";
 
 const MyExample = () => {
   return (
@@ -147,7 +131,7 @@ const screen = new Screen({
 
 screen.key(["C-c"], () => process.exit(0));
 
-render(<MyExample />, { screen });
+render(<MyExample />, { runtime: new NodeRuntime() });
 screen.render();
 ```
 
@@ -160,9 +144,6 @@ screen.render();
 - Check `screen.width` and `screen.height` for responsive layouts
 
 ## Troubleshooting
-
-**"Runtime not initialized" error:**
-Make sure you have the runtime workaround at the top of your example file.
 
 **Events not firing:**
 

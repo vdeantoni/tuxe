@@ -9,11 +9,6 @@ import { NodeRuntime, Screen } from "@unblessed/node";
 import React, { useEffect, useState } from "react";
 import { BigText, Box, render, Text } from "../src/index.js";
 
-// WORKAROUND: In development, ensure runtime is initialized for source files too
-import { setRuntime } from "@unblessed/core";
-
-setRuntime(new NodeRuntime());
-
 const GRID_WIDTH = 20;
 const GRID_HEIGHT = 10;
 
@@ -180,7 +175,7 @@ screen.key(["C-c", "q"], () => {
 });
 
 // Render the app
-render(<KeyboardGame />, { screen });
+render(<KeyboardGame />, { runtime: new NodeRuntime() });
 
 // Initial render
 screen.render();

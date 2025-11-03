@@ -593,19 +593,6 @@ node --import tsx --no-warnings keyboard-game.tsx
 
 ## Development Tips
 
-### Running Examples in Development
-
-Due to monorepo dual-package issues (source vs dist), examples need explicit runtime init:
-
-```tsx
-// WORKAROUND: In development
-import { setRuntime } from "@unblessed/core";
-import { NodeRuntime } from "@unblessed/node";
-setRuntime(new NodeRuntime());
-```
-
-This won't be needed in production when packages are installed from npm.
-
 ### Debug Mode
 
 Enable debug logging:

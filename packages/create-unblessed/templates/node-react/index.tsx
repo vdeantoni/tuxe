@@ -1,4 +1,3 @@
-import * as React from "react";
 import { Screen } from "@unblessed/node";
 import { Box, render, Text } from "@unblessed/react";
 

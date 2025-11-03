@@ -161,6 +161,9 @@ export function buildTextStyles(props: StyleObject): any | null {
 /**
  * Builds focusable widget options
  *
+ * **IMPORTANT**: For focus effects to work, elements must be keyable.
+ * This ensures they receive focus/blur events from the screen.
+ *
  * @param props - Props with focus configuration
  * @param defaultTabIndex - Default tabIndex value if not provided (typically 0 for interactive widgets, undefined for non-interactive)
  * @returns Options object with focus properties
@@ -176,6 +179,13 @@ export function buildFocusableOptions(
     options.tabIndex = props.tabIndex;
   } else if (defaultTabIndex !== undefined) {
     options.tabIndex = defaultTabIndex;
+  }
+
+  // CRITICAL: Set keyable=true if element has tabIndex
+  // This ensures the element receives keyboard input and focus/blur events
+  // Without this, focusEffects won't work!
+  if (options.tabIndex !== undefined) {
+    options.keyable = true;
   }
 
   return options;
