@@ -76,6 +76,11 @@ export abstract class WidgetDescriptor<TProps = any> {
   /**
    * Update an existing widget with new layout and options.
    *
+   * IMPORTANT: This method must preserve runtime hover/focus state.
+   * When hover/focus effects are active, Screen.setEffects() modifies widget.style
+   * and stores original values in temporary objects (_htemp, _ftemp).
+   * We must not overwrite widget.style when effects are active.
+   *
    * @param widget - Existing widget instance to update
    * @param layout - New computed layout from Yoga (with border adjustments already applied)
    */
@@ -86,7 +91,95 @@ export abstract class WidgetDescriptor<TProps = any> {
     widget.position.width = layout.width;
     widget.position.height = layout.height;
 
-    // Update widget options
-    Object.assign(widget, this.widgetOptions);
+    // Get new widget options
+    const options = this.widgetOptions;
+
+    // Check if hover/focus effects are currently active
+    const hoverTemp = (widget as any)._htemp;
+    const focusTemp = (widget as any)._ftemp;
+    const hasActiveEffects = hoverTemp || focusTemp;
+
+    if (hasActiveEffects) {
+      // Effects are active - preserve style, update everything else
+      const { style, hoverEffects, focusEffects, ...otherOptions } = options;
+
+      // Deep clone other options to avoid shared references
+      const safeOptions = this.deepCloneOptions(otherOptions);
+      Object.assign(widget, safeOptions);
+
+      // Update the temp storage to reflect new base style values
+      // This ensures when mouseout/blur happens, we restore to the NEW base
+      if (hoverTemp && hoverEffects && style) {
+        this.updateTempFromNewBase(hoverTemp, style, hoverEffects);
+      }
+      if (focusTemp && focusEffects && style) {
+        this.updateTempFromNewBase(focusTemp, style, focusEffects);
+      }
+    } else {
+      // No active effects - normal update with deep clone
+      const safeOptions = this.deepCloneOptions(options);
+      Object.assign(widget, safeOptions);
+    }
+  }
+
+  /**
+   * Update temporary storage with new base values while preserving effect state.
+   * When props change during hover/focus, we need to update what values will be
+   * restored on mouseout/blur, but keep the current hover/focus styling active.
+   *
+   * @param temp - Temporary storage object (_htemp or _ftemp)
+   * @param newBaseStyle - New base style from props
+   * @param effects - Effects configuration (hoverEffects or focusEffects)
+   */
+  private updateTempFromNewBase(
+    temp: any,
+    newBaseStyle: any,
+    effects: any,
+  ): void {
+    Object.keys(effects).forEach((key) => {
+      const effectVal = effects[key];
+      if (effectVal !== null && typeof effectVal === "object") {
+        // Nested object like border
+        temp[key] = temp[key] || {};
+        const newBase = newBaseStyle[key] || {};
+        Object.keys(effectVal).forEach((k) => {
+          // Update temp to store the new base value
+          // When mouseout/blur occurs, this is what will be restored
+          temp[key][k] = newBase[k];
+        });
+      } else {
+        // Simple property like fg, bg
+        temp[key] = newBaseStyle[key];
+      }
+    });
+  }
+
+  /**
+   * Deep clone options to avoid mutating shared object references.
+   *
+   * @param options - Options object to clone
+   * @returns Deep cloned options object
+   */
+  private deepCloneOptions(options: any): any {
+    if (!options || typeof options !== "object") {
+      return options;
+    }
+
+    const cloned: any = {};
+
+    for (const key in options) {
+      if (options.hasOwnProperty(key)) {
+        const val = options[key];
+
+        if (val !== null && typeof val === "object" && !Array.isArray(val)) {
+          // Recursively clone nested objects
+          cloned[key] = this.deepCloneOptions(val);
+        } else {
+          cloned[key] = val;
+        }
+      }
+    }
+
+    return cloned;
   }
 }

@@ -122,13 +122,13 @@ export function syncWidgetWithYoga(node: LayoutNode, screen: Screen): Element {
     }
 
     // Update event handlers
-    if (node.eventHandlers) {
+    if (node.eventHandlers !== node._boundHandlers) {
       if (node._boundHandlers) {
         unbindEventHandlers(node.widget, node._boundHandlers);
       }
 
-      if (Object.keys(node.eventHandlers).length > 0) {
-        bindEventHandlers(node.widget, node.eventHandlers);
+      if (Object.keys(node.eventHandlers || {}).length > 0) {
+        bindEventHandlers(node.widget, node.eventHandlers || {});
         node._boundHandlers = node.eventHandlers;
       } else {
         node._boundHandlers = undefined;

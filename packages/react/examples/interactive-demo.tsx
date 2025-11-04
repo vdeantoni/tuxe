@@ -40,10 +40,10 @@ const InteractiveDemo = () => {
         flexDirection="column"
         border={1}
         borderStyle="single"
-        borderColor="green"
+        borderColor="white"
         padding={1}
-        focus={{ bg: "blue" }}
-        hover={{ bg: "red" }}
+        focus={{ bg: "blue", border: { color: "blue" } }}
+        hover={{ bg: "green", border: { color: "green" } }}
         onMouseMove={(data) => setMousePos({ x: data.x, y: data.y })}
         onClick={(data) => {
           setLastClick({ x: data.x, y: data.y });

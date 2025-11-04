@@ -186,6 +186,7 @@ export function buildFocusableOptions(
   // Without this, focusEffects won't work!
   if (options.tabIndex !== undefined) {
     options.keyable = true;
+    options.clickable = true;
   }
 
   return options;
