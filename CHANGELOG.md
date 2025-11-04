@@ -1,3 +1,51 @@
+# [1.0.0-alpha.18](https://github.com/vdeantoni/unblessed/compare/v1.0.0-alpha.17...v1.0.0-alpha.18) (2025-11-04)
+
+
+### Bug Fixes
+
+* **create:** fixed version used by the templates ([cfa8bff](https://github.com/vdeantoni/unblessed/commit/cfa8bfffd5e0b20da322716a905a3fcdb29c1c31))
+* **layout:** preserve hover/focus state during React re-renders ([8a57b7d](https://github.com/vdeantoni/unblessed/commit/8a57b7d80ceb26938c4fd0792b3bcccb4b3b70b1))
+* **react:** add keyable=true for focusable elements to enable focus effects ([86bf753](https://github.com/vdeantoni/unblessed/commit/86bf753ea1673199733ff00c75d0f97569e92190))
+
+
+### Features
+
+* **react:** add runtime parameter and optional screen to render() ([9662718](https://github.com/vdeantoni/unblessed/commit/966271820eef6d94dfa86c30455b88f695be8257))
+
+
+### BREAKING CHANGES
+
+* **react:** render() now requires runtime parameter
+
+Changes:
+- Add required `runtime` parameter to RenderOptions
+- Add optional `screen` parameter to RenderOptions
+- Update render() to use provided screen or create default
+- Implement proper screen lifecycle management:
+  - If screen provided by user: user must call screen.destroy()
+  - If screen created by render(): unmount() destroys it automatically
+- Export testRuntime from __tests__/setup.ts for test usage
+- Update all test files (22 tests) to use new API
+- Update JSDoc examples showing both basic and advanced usage
+- Add JSDoc documentation to setRuntime() in @unblessed/core
+
+Benefits:
+- Tests can provide custom screen configurations
+- Default case is simple: just pass runtime
+- Clear lifecycle ownership rules
+- Matches hello-react.tsx example pattern
+
+Updated test files:
+- render.test.tsx (4 tests)
+- events.test.tsx (6 tests)
+- content-update.test.tsx (2 tests)
+- text-width-update.test.tsx (2 tests)
+- list.test.tsx (8 tests)
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+
 # [1.0.0-alpha.17](https://github.com/vdeantoni/unblessed/compare/v1.0.0-alpha.16...v1.0.0-alpha.17) (2025-11-03)
 
 
