@@ -4,6 +4,7 @@
 
 import type { KeyEvent, MouseEvent, Runtime, Screen } from "@unblessed/core";
 import type { ReactNode } from "react";
+import type { Theme } from "./theme.js";
 
 /**
  * Options for the render() function
@@ -21,6 +22,12 @@ export interface RenderOptions {
    * If provided, you are responsible for calling screen.destroy().
    */
   screen?: Screen;
+
+  /**
+   * Theme instance (optional)
+   * If not provided, defaults to unblessedTheme.
+   */
+  theme?: Theme;
 
   /**
    * Debug mode - logs render cycles

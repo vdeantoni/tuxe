@@ -526,12 +526,207 @@ descriptor.eventHandlers = {
 
 **Key insight:** Descriptor acts as the adapter between React props and unblessed widgets, handling all the prop splitting and conversion logic.
 
+## Theme System
+
+**Status:** ✅ **Complete** - Full theme support with runtime switching
+
+The theme system provides a professional design token architecture for consistent, customizable styling across your terminal UI.
+
+### Architecture Overview
+
+**Three-layer design tokens:**
+
+1. **Primitives** - Color palette foundation (gray50-900, blue50-900, etc.)
+2. **Semantic** - Intent-based colors (primary, success, error, foreground, etc.)
+3. **Components** - Widget-specific defaults (box.bg, button.fg, etc.)
+
+**Runtime swappable** via `useTheme()` hook with automatic re-rendering.
+
+**Hybrid widget integration:**
+
+- Explicit colors take priority (backward compatible)
+- Theme references via `$` prefix (e.g., `fg="$primary"`)
+- Auto-fallback to component/semantic defaults when colors omitted
+- Terminal capability auto-reduction using existing `colors.reduce()`
+
+### Theme Structure
+
+```typescript
+interface Theme {
+  name: string;
+  primitives: ThemePrimitives; // Color scales (50-900)
+  semantic: ThemeSemantic; // Intent-based colors
+  components: ComponentColors; // Widget defaults
+}
+```
+
+### Usage Examples
+
+**Basic usage with default theme:**
+
+```tsx
+import { render, Box, Text, unblessedTheme } from "@unblessed/react";
+
+render(<App />, {
+  runtime,
+  theme: unblessedTheme, // Optional, this is the default
+});
+```
+
+**Runtime theme switching:**
+
+```tsx
+import { useTheme, unblessedTheme, matrixTheme } from "@unblessed/react";
+
+function App() {
+  const [theme, setTheme] = useTheme();
+
+  return (
+    <Box>
+      <Button
+        onClick={() =>
+          setTheme(theme === unblessedTheme ? matrixTheme : unblessedTheme)
+        }
+      >
+        Toggle Theme
+      </Button>
+    </Box>
+  );
+}
+```
+
+**Theme color references:**
+
+```tsx
+// Semantic colors (recommended)
+<Text fg="$primary">Primary text</Text>
+<Text fg="$semantic.success">Success message</Text>
+
+// Primitive colors (for specific shades)
+<Box borderColor="$primitives.blue.500">Blue border</Box>
+
+// Explicit colors (theme-independent)
+<Text fg="cyan">Always cyan, ignores theme</Text>
+```
+
+### Color Resolution Order
+
+When a color prop is specified, resolution happens in this order:
+
+1. **Explicit color** (e.g., `"cyan"`, `"#ff0000"`) - Highest priority, ignores theme
+2. **Theme reference** (e.g., `"$primary"`) - Resolved from theme
+3. **Component default** (e.g., `theme.components.box.fg`) - Used when prop omitted
+4. **Fallback** - Transparent/default if all else fails
+
+### Theme Reference Syntax
+
+Theme references use `$` prefix and dot notation:
+
+- `$primary` → `theme.semantic.primary` (shorthand for semantic)
+- `$semantic.success` → `theme.semantic.success`
+- `$semantic.border` → `theme.semantic.border`
+- `$primitives.blue.500` → `theme.primitives.blue[500]`
+
+### Available Themes
+
+**`unblessedTheme`** - Professional dark theme optimized for terminal readability
+
+- Background: `#111827` (gray.900)
+- Foreground: `#e5e7eb` (gray.200)
+- Primary: `#3b82f6` (blue.500)
+- Based on Tailwind CSS color system
+
+**`matrixTheme`** - Matrix movie-inspired cyber-punk theme
+
+- Background: `#0a0e0a` (near-black with green tint)
+- Foreground: `#00ff41` (bright Matrix green)
+- Primary: `#00ff00` (classic Matrix green)
+- Accent colors: Cyan, dark red (errors), amber (warnings)
+- Perfect for terminal animations and Matrix rain effects
+
+Both themes include complete color scales and semantic mappings.
+
+### Implementation Details
+
+**Theme Storage:**
+
+- Theme passed via `render()` options
+- Stored in reconciler alongside LayoutManager
+- Automatically injected into all widget descriptors
+
+**Theme Provider (Internal):**
+
+- `render()` automatically wraps app in `<ThemeProvider>`
+- Users never directly use `<ThemeProvider>`
+- Theme state managed via React Context
+
+**Widget Integration:**
+
+- `WidgetDescriptor<TProps, TTheme>` - Generic theme parameter
+- Base class in `@unblessed/layout` stays agnostic
+- React descriptors specialize with `Theme` type
+- Helper functions (`buildBorder`, `buildTextStyles`, etc.) accept theme parameter
+- Colors resolved during `widgetOptions` getter
+
+**Terminal Compatibility:**
+
+- All colors automatically reduced to terminal capabilities
+- Uses existing `colors.convert()` from `@unblessed/core`
+- Supports 256-color, 16-color, and 8-color terminals
+- No manual fallbacks needed
+
+### Creating Custom Themes
+
+```typescript
+import { Theme, unblessedTheme } from '@unblessed/react';
+
+const myTheme: Theme = {
+  name: 'my-theme',
+  primitives: unblessedTheme.primitives,  // Reuse color scales
+  semantic: {
+    ...unblessedTheme.semantic,
+    primary: '#ff6b6b',        // Custom primary color
+    success: '#51cf66',        // Custom success color
+    // ... other semantic overrides
+  },
+  components: {
+    ...unblessedTheme.components,
+    button: {
+      bg: '$primary',         // Reference semantic colors
+      fg: '#ffffff',
+      border: '$primary',
+      // ... other button colors
+    },
+    // ... other component overrides
+  },
+};
+
+render(<App />, { runtime, theme: myTheme });
+```
+
+### Theme Examples
+
+See `examples/theme-demo.tsx` for a comprehensive demonstration showing:
+
+- Default theme usage
+- Runtime theme switching
+- Theme color references
+- Explicit vs themed colors
+- Multiple widget types with themed styling
+
+Run with:
+
+```bash
+cd packages/react/examples
+node --import tsx --no-warnings theme-demo.tsx
+```
+
 ## Current State
 
 **✅ Working:**
 
 - React reconciler integration
-- Box, Text, Spacer, BigText, Button, Input components
+- Box, Text, Spacer, BigText, Button, Input, List components
 - Flexbox layout (flexGrow, justifyContent, gap, etc.)
 - Border styles and colors (per-side support)
 - Absolute positioning from Yoga
@@ -541,6 +736,10 @@ descriptor.eventHandlers = {
 - **Content updates on state changes (text concatenation)**
 - **Widget descriptor pattern for type-safe configuration**
 - **Composition via helper functions (borders, text styles, focus)**
+- **Theme system with runtime switching (useTheme hook)**
+- **Design token architecture (primitives → semantic → components)**
+- **Theme color references ($primary, $semantic.success, etc.)**
+- **Automatic terminal color reduction**
 - 14 tests passing (4 render + 6 event + 2 content update + 2 text width tests)
 
 **📋 TODO:**

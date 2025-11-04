@@ -112,7 +112,10 @@ export class ListDescriptor extends BoxDescriptor<ListProps> {
 
     // Selected item styling
     if (this.props.itemSelected) {
-      const selectedStyle = buildStyleObject(this.props.itemSelected);
+      const selectedStyle = buildStyleObject(
+        this.props.itemSelected,
+        this.theme,
+      );
       if (selectedStyle.fg !== undefined) options.selectedFg = selectedStyle.fg;
       if (selectedStyle.bg !== undefined) options.selectedBg = selectedStyle.bg;
       if (selectedStyle.bold !== undefined)
@@ -127,7 +130,7 @@ export class ListDescriptor extends BoxDescriptor<ListProps> {
 
     // Normal item styling
     if (this.props.itemStyle) {
-      const itemStyleObj = buildStyleObject(this.props.itemStyle);
+      const itemStyleObj = buildStyleObject(this.props.itemStyle, this.theme);
       if (itemStyleObj.fg !== undefined) options.itemFg = itemStyleObj.fg;
       if (itemStyleObj.bg !== undefined) options.itemBg = itemStyleObj.bg;
       if (itemStyleObj.bold !== undefined) options.itemBold = itemStyleObj.bold;
@@ -141,7 +144,7 @@ export class ListDescriptor extends BoxDescriptor<ListProps> {
 
     // Item hover styling
     if (this.props.itemHover) {
-      const hoverStyle = buildStyleObject(this.props.itemHover);
+      const hoverStyle = buildStyleObject(this.props.itemHover, this.theme);
       if (hoverStyle.bg !== undefined) options.itemHoverBg = hoverStyle.bg;
     }
 

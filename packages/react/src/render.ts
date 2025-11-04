@@ -6,11 +6,15 @@
  */
 
 import { Screen, setRuntime } from "@unblessed/core";
-import { LayoutManager } from "@unblessed/layout";
-import type { ReactNode } from "react";
+import { LayoutManager, syncTreeAndRender } from "@unblessed/layout";
+import React, { type ReactNode } from "react";
 import { BoxDescriptor } from "./components/Box.js";
+import { ThemeProvider } from "./components/ThemeProvider.js";
 import { createElement } from "./dom.js";
+import { ScreenProvider } from "./hooks/ScreenContext.js";
 import reconciler, { setLayoutManager } from "./reconciler.js";
+import { setCurrentTheme } from "./theme-registry.js";
+import { unblessedTheme } from "./themes/index.js";
 import type { RenderInstance, RenderOptions } from "./types.js";
 
 /**
@@ -64,6 +68,12 @@ export function render(
 ): RenderInstance {
   setRuntime(options.runtime);
 
+  // Use provided theme or default to unblessed theme
+  const theme = options.theme || unblessedTheme;
+
+  // Initialize theme registry with the initial theme
+  setCurrentTheme(theme);
+
   // Use provided screen or create default
   const screen =
     options.screen ||
@@ -85,10 +95,14 @@ export function render(
   setLayoutManager(manager);
 
   // Create root layout node using BoxDescriptor (treat root like a box)
-  const rootDescriptor = new BoxDescriptor({
-    width: screen.width || 80,
-    height: screen.height || 24,
-  });
+  // Pass theme to descriptor (even though root doesn't use it for colors)
+  const rootDescriptor = new BoxDescriptor(
+    {
+      width: screen.width || 80,
+      height: screen.height || 24,
+    },
+    theme,
+  );
 
   const rootLayoutNode = manager.createNode(
     "root",
@@ -125,14 +139,54 @@ export function render(
     resolveExitPromise = resolve;
   });
 
+  // Wrap user element in ScreenProvider and ThemeProvider
+  const wrappedElement = React.createElement(ScreenProvider, {
+    screen,
+    children: React.createElement(ThemeProvider, { theme, children: element }),
+  });
+
   // Render the React element
-  reconciler.updateContainer(element, container, null, () => {
+  reconciler.updateContainer(wrappedElement, container, null, () => {
     // Initial render complete
   });
+
+  // Handle terminal resize
+  const handleResize = () => {
+    // Update root layout node dimensions
+    rootLayoutNode.yogaNode.setWidth(screen.width || 80);
+    rootLayoutNode.yogaNode.setHeight(screen.height || 24);
+    rootLayoutNode.props.width = screen.width || 80;
+    rootLayoutNode.props.height = screen.height || 24;
+
+    // Recalculate layout with new dimensions
+    manager.performLayout(rootLayoutNode);
+
+    // Sync updated layout to widgets and render
+    syncTreeAndRender(rootLayoutNode, screen);
+  };
+
+  screen.on("resize", handleResize);
+
+  // Register default quit shortcuts (q and Ctrl+C)
+  // Users can override these with useKeyboard() if needed
+  const defaultQuitHandler = () => {
+    if (screenCreatedByRender) {
+      screen.destroy();
+    }
+    process.exit(0);
+  };
+
+  screen.key(["q", "C-c"], defaultQuitHandler);
 
   return {
     screen,
     unmount: () => {
+      // Remove resize listener
+      screen.off("resize", handleResize);
+
+      // Remove default quit shortcuts
+      screen.unkey(["q", "C-c"], defaultQuitHandler);
+
       // Unmount React tree
       reconciler.updateContainer(null, container, null, () => {});
 
@@ -149,7 +203,15 @@ export function render(
     },
 
     rerender: (newElement: ReactNode) => {
-      reconciler.updateContainer(newElement, container, null, () => {});
+      // Also wrap rerender element in ScreenProvider and ThemeProvider
+      const wrappedNewElement = React.createElement(ScreenProvider, {
+        screen,
+        children: React.createElement(ThemeProvider, {
+          theme,
+          children: newElement,
+        }),
+      });
+      reconciler.updateContainer(wrappedNewElement, container, null, () => {});
     },
 
     waitUntilExit: () => exitPromise,

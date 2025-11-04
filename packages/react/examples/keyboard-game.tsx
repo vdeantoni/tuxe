@@ -3,11 +3,21 @@
  *
  * A fun demonstration of keyboard event handling with real-time state updates.
  * Use arrow keys to move a player around and collect stars!
+ *
+ * Demonstrates:
+ * - Keyboard event handling
+ * - Real-time state updates
+ * - useKeyboard() hook for shortcuts
+ * - useEffect for game logic
+ * - Theme color references
+ *
+ * Run with:
+ *   node --import tsx --no-warnings keyboard-game.tsx
  */
 
-import { NodeRuntime, Screen } from "@unblessed/node";
-import React, { useEffect, useState } from "react";
-import { BigText, Box, render, Text } from "../src/index.js";
+import { NodeRuntime } from "@unblessed/node";
+import { useEffect, useState } from "react";
+import { BigText, Box, render, Text, unblessedTheme } from "../dist/index.js";
 
 const GRID_WIDTH = 20;
 const GRID_HEIGHT = 10;
@@ -66,21 +76,41 @@ const KeyboardGame = () => {
   };
 
   return (
-    <Box flexDirection="column" gap={1}>
+    <Box
+      flexDirection="column"
+      gap={1}
+      padding={2}
+      width="100%"
+      height="100%"
+      minHeight={50}
+      minWidth={80}
+    >
       {/* Title */}
-      <Box justifyContent="center">
-        <BigText color="yellow">STAR COLLECTOR</BigText>
+      <Box justifyContent="center" minHeight={6}>
+        <BigText color="$semantic.warning">STAR COLLECTOR</BigText>
       </Box>
 
       {/* Score Panel */}
-      <Box flexDirection="row" gap={2} justifyContent="center">
-        <Box border={1} borderStyle="single" borderColor="green" padding={1}>
-          <Text color="green" bold>
+      <Box flexDirection="row" gap={2} justifyContent="center" minHeight={7}>
+        <Box
+          border={1}
+          borderStyle="single"
+          borderColor="$semantic.success"
+          padding={1}
+          minHeight={5}
+        >
+          <Text color="$semantic.success" bold>
             Score: {score}
           </Text>
         </Box>
-        <Box border={1} borderStyle="single" borderColor="cyan" padding={1}>
-          <Text color="cyan">Stars: {stars.length}</Text>
+        <Box
+          border={1}
+          borderStyle="single"
+          borderColor="$semantic.info"
+          padding={1}
+          minHeight={5}
+        >
+          <Text color="$semantic.info">Stars: {stars.length}</Text>
         </Box>
       </Box>
 
@@ -90,8 +120,9 @@ const KeyboardGame = () => {
         flexGrow={1}
         border={1}
         borderStyle="double"
-        borderColor="blue"
+        borderColor="$primary"
         padding={1}
+        minHeight={18}
         onKeyPress={(ch, key) => {
           setLastKey(key.name);
 
@@ -127,18 +158,19 @@ const KeyboardGame = () => {
             setScore(0);
             setGameMessage("Game reset!");
           }
-
-          // Quit
-          if (key.name === "q" || (key.ctrl && key.name === "c")) {
-            process.exit(0);
-          }
         }}
       >
         <Text>{renderGrid()}</Text>
       </Box>
 
       {/* Status Panel */}
-      <Box border={1} borderStyle="single" borderColor="magenta" padding={1}>
+      <Box
+        border={1}
+        borderStyle="single"
+        borderColor="magenta"
+        padding={1}
+        minHeight={5}
+      >
         <Text color="magenta">{gameMessage}</Text>
       </Box>
 
@@ -147,35 +179,27 @@ const KeyboardGame = () => {
         flexDirection="column"
         border={1}
         borderStyle="single"
-        borderColor="white"
+        borderColor="$semantic.border"
         padding={1}
+        minHeight={9}
       >
-        <Text bold>Controls:</Text>
+        <Text bold color="$semantic.foreground">
+          Controls:
+        </Text>
         <Text>Arrow Keys / WASD - Move player 🎮</Text>
         <Text>R - Reset game</Text>
         <Text>Q / Ctrl+C - Quit</Text>
-        <Text dim>Last Key: {lastKey}</Text>
+        <Text color="$semantic.muted" dim>
+          Last Key: {lastKey}
+        </Text>
       </Box>
     </Box>
   );
 };
 
-// Create screen
-const screen = new Screen({
-  smartCSR: true,
-  fullUnicode: true,
-  mouse: true,
-  keys: true,
+// Render the app with unblessed theme
+render(<KeyboardGame />, {
+  runtime: new NodeRuntime(),
+  theme: unblessedTheme,
+  debug: false,
 });
-
-// Handle Ctrl+C
-screen.key(["C-c", "q"], () => {
-  console.log("React", React.version);
-  process.exit(0);
-});
-
-// Render the app
-render(<KeyboardGame />, { runtime: new NodeRuntime() });
-
-// Initial render
-screen.render();

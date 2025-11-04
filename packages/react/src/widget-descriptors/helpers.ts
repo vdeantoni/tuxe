@@ -6,6 +6,8 @@
  */
 
 import { colors } from "@unblessed/core";
+import { resolveColor } from "../theme-utils.js";
+import type { Theme } from "../theme.js";
 import type {
   BorderProps,
   BorderStyleObject,
@@ -29,10 +31,12 @@ interface BorderNumberProps {
  * IMPORTANT: Only creates border if Yoga knows about it (border numbers are set)
  *
  * @param props - Props with border configuration
+ * @param theme - Theme for color resolution
  * @returns Border object or null if no border numbers are set
  */
 export function buildBorder(
   props: BorderProps & BorderNumberProps,
+  theme: Theme,
 ): any | null {
   // Only create border if Yoga knows about it (has border numbers)
   // This prevents creating borders that Yoga doesn't reserve space for
@@ -61,22 +65,27 @@ export function buildBorder(
   border.right =
     props.borderRight !== undefined ? Number(props.borderRight) > 0 : true;
 
-  // Border color (global or per-side)
+  // Border color (global or per-side) - resolve from theme
   if (props.borderColor) {
-    border.fg = colors.convert(props.borderColor);
+    const resolved = resolveColor(props.borderColor, theme);
+    border.fg = colors.convert(resolved);
   }
 
   if (props.borderTopColor) {
-    border.topColor = colors.convert(props.borderTopColor);
+    const resolved = resolveColor(props.borderTopColor, theme);
+    border.topColor = colors.convert(resolved);
   }
   if (props.borderBottomColor) {
-    border.bottomColor = colors.convert(props.borderBottomColor);
+    const resolved = resolveColor(props.borderBottomColor, theme);
+    border.bottomColor = colors.convert(resolved);
   }
   if (props.borderLeftColor) {
-    border.leftColor = colors.convert(props.borderLeftColor);
+    const resolved = resolveColor(props.borderLeftColor, theme);
+    border.leftColor = colors.convert(resolved);
   }
   if (props.borderRightColor) {
-    border.rightColor = colors.convert(props.borderRightColor);
+    const resolved = resolveColor(props.borderRightColor, theme);
+    border.rightColor = colors.convert(resolved);
   }
 
   // Border dim (global or per-side)
@@ -120,9 +129,10 @@ export function prepareBorderStyle(border: any): any {
  * Builds text style object from TextStyleProps
  *
  * @param props - Props with text styling
+ * @param theme - Theme for color resolution
  * @returns Style object or null if no text styles are set
  */
-export function buildTextStyles(props: StyleObject): any | null {
+export function buildTextStyles(props: StyleObject, theme: Theme): any | null {
   if (
     !props.color &&
     !props.backgroundColor &&
@@ -141,10 +151,12 @@ export function buildTextStyles(props: StyleObject): any | null {
   const style: any = {};
 
   if (props.color) {
-    style.fg = colors.convert(props.color);
+    const resolved = resolveColor(props.color, theme);
+    style.fg = colors.convert(resolved);
   }
   if (props.backgroundColor) {
-    style.bg = colors.convert(props.backgroundColor);
+    const resolved = resolveColor(props.backgroundColor, theme);
+    style.bg = colors.convert(resolved);
   }
   if (props.bold) style.bold = true;
   if (props.italic) style.italic = true;
@@ -222,9 +234,13 @@ export function mergeStyles(...styles: any[]): any {
  * Converts color names to numbers and normalizes shorthands
  *
  * @param borderStyle - Border style configuration
+ * @param theme - Theme for color resolution
  * @returns Unblessed border style object
  */
-function buildBorderStyleObject(borderStyle: BorderStyleObject): any {
+function buildBorderStyleObject(
+  borderStyle: BorderStyleObject,
+  theme: Theme,
+): any {
   const border: any = {};
 
   // Normalize color shorthands
@@ -232,19 +248,33 @@ function buildBorderStyleObject(borderStyle: BorderStyleObject): any {
   const bg =
     borderStyle.bg ?? borderStyle.background ?? borderStyle.backgroundColor;
 
-  // Main colors
-  if (fg) border.fg = colors.convert(fg);
-  if (bg) border.bg = colors.convert(bg);
+  // Main colors - resolve from theme
+  if (fg) {
+    const resolved = resolveColor(fg, theme);
+    border.fg = colors.convert(resolved);
+  }
+  if (bg) {
+    const resolved = resolveColor(bg, theme);
+    border.bg = colors.convert(resolved);
+  }
 
-  // Per-side colors
-  if (borderStyle.topColor)
-    border.topColor = colors.convert(borderStyle.topColor);
-  if (borderStyle.bottomColor)
-    border.bottomColor = colors.convert(borderStyle.bottomColor);
-  if (borderStyle.leftColor)
-    border.leftColor = colors.convert(borderStyle.leftColor);
-  if (borderStyle.rightColor)
-    border.rightColor = colors.convert(borderStyle.rightColor);
+  // Per-side colors - resolve from theme
+  if (borderStyle.topColor) {
+    const resolved = resolveColor(borderStyle.topColor, theme);
+    border.topColor = colors.convert(resolved);
+  }
+  if (borderStyle.bottomColor) {
+    const resolved = resolveColor(borderStyle.bottomColor, theme);
+    border.bottomColor = colors.convert(resolved);
+  }
+  if (borderStyle.leftColor) {
+    const resolved = resolveColor(borderStyle.leftColor, theme);
+    border.leftColor = colors.convert(resolved);
+  }
+  if (borderStyle.rightColor) {
+    const resolved = resolveColor(borderStyle.rightColor, theme);
+    border.rightColor = colors.convert(resolved);
+  }
 
   // Dim properties
   if (borderStyle.dim !== undefined) border.dim = borderStyle.dim;
@@ -264,9 +294,13 @@ function buildBorderStyleObject(borderStyle: BorderStyleObject): any {
  * Handles color conversion and shorthand normalization
  *
  * @param styleObj - Style configuration object
+ * @param theme - Theme for color resolution
  * @returns Unblessed style object
  */
-export function buildStyleObject(styleObj?: StyleObject): any {
+export function buildStyleObject(
+  styleObj: StyleObject | undefined,
+  theme: Theme,
+): any {
   if (!styleObj) return {};
 
   const style: any = {};
@@ -275,9 +309,15 @@ export function buildStyleObject(styleObj?: StyleObject): any {
   const fg = styleObj.fg ?? styleObj.color;
   const bg = styleObj.bg ?? styleObj.background ?? styleObj.backgroundColor;
 
-  // Text colors
-  if (fg) style.fg = colors.convert(fg);
-  if (bg) style.bg = colors.convert(bg);
+  // Text colors - resolve from theme
+  if (fg) {
+    const resolved = resolveColor(fg, theme);
+    style.fg = colors.convert(resolved);
+  }
+  if (bg) {
+    const resolved = resolveColor(bg, theme);
+    style.bg = colors.convert(resolved);
+  }
 
   // Text styles
   if (styleObj.bold !== undefined) style.bold = styleObj.bold;
@@ -290,9 +330,9 @@ export function buildStyleObject(styleObj?: StyleObject): any {
   if (styleObj.blink !== undefined) style.blink = styleObj.blink;
   if (styleObj.hide !== undefined) style.invisible = styleObj.hide;
 
-  // Border styling (nested)
+  // Border styling (nested) - pass theme through
   if (styleObj.border) {
-    style.border = buildBorderStyleObject(styleObj.border);
+    style.border = buildBorderStyleObject(styleObj.border, theme);
   }
 
   return style;

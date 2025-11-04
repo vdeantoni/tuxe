@@ -27,18 +27,30 @@ import { ComputedLayout, FlexboxProps } from "./types";
  * 5. Creating the actual unblessed widget instance
  *
  * @template TProps - The typed props interface for this widget
+ * @template TTheme - The theme type (defaults to any for renderer flexibility)
  */
-export abstract class WidgetDescriptor<TProps = any> {
+export abstract class WidgetDescriptor<TProps = any, TTheme = any> {
   /**
    * Widget type identifier (e.g., 'box', 'text', 'button')
    */
   abstract readonly type: string;
 
   /**
-   * Constructor stores the props
-   * @param props - Typed props for this widget
+   * Theme instance (available to subclasses for color resolution)
    */
-  constructor(public props: TProps) {}
+  protected theme: TTheme;
+
+  /**
+   * Constructor stores the props and theme
+   * @param props - Typed props for this widget
+   * @param theme - Theme instance for color/style resolution
+   */
+  constructor(
+    public props: TProps,
+    theme: TTheme,
+  ) {
+    this.theme = theme;
+  }
 
   /**
    * Extract flexbox-related properties for Yoga layout engine.

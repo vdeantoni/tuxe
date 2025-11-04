@@ -10,6 +10,7 @@ import {
   FlexboxProps,
   WidgetDescriptor,
 } from "@unblessed/layout";
+import type { Theme } from "../theme.js";
 
 /**
  * Props interface for Spacer component
@@ -19,7 +20,7 @@ export interface SpacerProps extends FlexboxProps {}
 /**
  * Descriptor for Spacer widgets
  */
-export class SpacerDescriptor extends WidgetDescriptor<SpacerProps> {
+export class SpacerDescriptor extends WidgetDescriptor<SpacerProps, Theme> {
   readonly type = "spacer";
 
   get flexProps(): FlexboxProps {

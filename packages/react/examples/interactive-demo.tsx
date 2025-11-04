@@ -8,12 +8,25 @@
  * - Input handling
  * - State management
  * - Visual feedback
+ * - useKeyboard() hook for shortcuts
+ * - Theme color references
+ *
+ * Run with:
+ *   node --import tsx --no-warnings interactive-demo.tsx
  */
 
-import { NodeRuntime, Screen } from "@unblessed/node";
-import React, { useState } from "react";
+import { NodeRuntime } from "@unblessed/node";
+import { useState } from "react";
 
-import { BigText, Box, Button, Input, render, Text } from "../src/index.js";
+import {
+  BigText,
+  Box,
+  Button,
+  Input,
+  render,
+  Text,
+  unblessedTheme,
+} from "../dist/index.js";
 
 const InteractiveDemo = () => {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -28,10 +41,18 @@ const InteractiveDemo = () => {
   const colors = ["red", "green", "blue", "yellow", "magenta", "cyan"];
 
   return (
-    <Box flexDirection="column" gap={1}>
+    <Box
+      flexDirection="column"
+      gap={1}
+      padding={2}
+      width="100%"
+      height="100%"
+      minHeight={50}
+      minWidth={80}
+    >
       {/* Title */}
-      <Box justifyContent="center">
-        <BigText color="cyan">EVENTS</BigText>
+      <Box justifyContent="center" minHeight={6}>
+        <BigText color="$primary">EVENTS</BigText>
       </Box>
 
       {/* Mouse Tracking Panel */}
@@ -40,7 +61,7 @@ const InteractiveDemo = () => {
         flexDirection="column"
         border={1}
         borderStyle="single"
-        borderColor="white"
+        borderColor="$semantic.border"
         padding={1}
         focus={{ bg: "blue", border: { color: "blue" } }}
         hover={{ bg: "green", border: { color: "green" } }}
@@ -49,8 +70,9 @@ const InteractiveDemo = () => {
           setLastClick({ x: data.x, y: data.y });
           setClickCount((c) => c + 1);
         }}
+        minHeight={9}
       >
-        <Text bold color="green">
+        <Text bold color="$semantic.success">
           🖱️ Mouse Tracker (move mouse & click here)
         </Text>
         <Text>
@@ -67,11 +89,12 @@ const InteractiveDemo = () => {
         flexDirection="column"
         border={1}
         borderStyle="single"
-        borderColor="yellow"
+        borderColor="$semantic.warning"
         padding={1}
         gap={1}
+        minHeight={11}
       >
-        <Text bold color="yellow">
+        <Text bold color="$semantic.warning">
           🎨 Color Picker (click to select)
         </Text>
         <Box flexDirection="row" gap={1}>
@@ -94,18 +117,19 @@ const InteractiveDemo = () => {
       </Box>
 
       {/* Interactive Buttons Panel */}
-      <Box flexDirection="row" gap={2}>
+      <Box flexDirection="row" gap={2} minHeight={12}>
         {/* Counter Button */}
         <Box
           flexDirection="column"
           flexGrow={1}
           border={1}
           borderStyle="single"
-          borderColor="blue"
+          borderColor="$primary"
           padding={1}
           gap={1}
+          minHeight={10}
         >
-          <Text bold color="blue">
+          <Text bold color="$primary">
             🔢 Counter
           </Text>
           <Box flexDirection="row" gap={1}>
@@ -113,9 +137,10 @@ const InteractiveDemo = () => {
               width={8}
               height={3}
               border={1}
-              borderColor="red"
+              borderColor="$semantic.error"
               hover={{ bg: "red" }}
               onPress={() => setClickCount((c) => Math.max(0, c - 1))}
+              tabIndex={0}
             >
               {"{center}-{/center}"}
             </Button>
@@ -124,6 +149,7 @@ const InteractiveDemo = () => {
               height={3}
               border={1}
               borderStyle="single"
+              borderColor="$semantic.border"
               justifyContent="center"
               alignItems="center"
             >
@@ -133,9 +159,10 @@ const InteractiveDemo = () => {
               width={8}
               height={3}
               border={1}
-              borderColor="green"
+              borderColor="$semantic.success"
               hover={{ bg: "green" }}
               onPress={() => setClickCount((c) => c + 1)}
+              tabIndex={1}
             >
               {"{center}+{/center}"}
             </Button>
@@ -151,17 +178,18 @@ const InteractiveDemo = () => {
           borderColor="magenta"
           padding={1}
           gap={1}
+          minHeight={10}
         >
           <Text bold color="magenta">
             ⌨️ Keyboard
           </Text>
           <Text>Last Key: {lastKey || "(none)"}</Text>
           <Box
-            tabIndex={0}
+            tabIndex={2}
             height={3}
             border={1}
             borderStyle="single"
-            borderColor="white"
+            borderColor="$semantic.border"
             hover={{ bg: "magenta" }}
             focus={{ bg: "green" }}
             onKeyPress={(ch, key) => {
@@ -180,25 +208,24 @@ const InteractiveDemo = () => {
         flexDirection="column"
         border={1}
         borderStyle="single"
-        borderColor="cyan"
+        borderColor="$semantic.info"
         padding={1}
         gap={1}
+        minHeight={13}
       >
-        <Text bold color="cyan">
+        <Text bold color="$semantic.info">
           💬 Message Board (type and press Enter)
         </Text>
         <Input
           border={1}
-          borderColor="cyan"
+          borderColor="$semantic.info"
+          padding={1}
           onSubmit={(value) => {
             setMessage(value || "");
           }}
           onCancel={() => setMessage("")}
-          onKeyPress={(ch, key) => {
-            if (key.ctrl && key.name === "c") {
-              process.exit(0);
-            }
-          }}
+          tabIndex={3}
+          minHeight={5}
         />
         {message && (
           <Box
@@ -215,29 +242,18 @@ const InteractiveDemo = () => {
       </Box>
 
       {/* Footer with instructions */}
-      <Box justifyContent="center">
-        <Text dim>Press Ctrl+C to exit</Text>
+      <Box justifyContent="center" minHeight={3}>
+        <Text color="$semantic.muted" dim>
+          Press 'q' or Ctrl+C to exit
+        </Text>
       </Box>
     </Box>
   );
 };
 
-// Create screen
-const screen = new Screen({
-  smartCSR: true,
-  fullUnicode: true,
-  mouse: true,
-  keys: true,
+// Render the app with unblessed theme
+render(<InteractiveDemo />, {
+  runtime: new NodeRuntime(),
+  theme: unblessedTheme,
+  debug: false,
 });
-
-// Handle Ctrl+C
-screen.key(["C-c"], () => {
-  console.log("React", React.version);
-  process.exit(0);
-});
-
-// Render the app
-render(<InteractiveDemo />, { runtime: new NodeRuntime(), debug: false });
-
-// Initial render
-screen.render();

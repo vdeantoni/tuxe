@@ -13,13 +13,14 @@ import { InputDescriptor } from "../components/Input.js";
 import { ListDescriptor } from "../components/List.js";
 import { SpacerDescriptor } from "../components/Spacer.js";
 import { TextDescriptor } from "../components/Text.js";
+import type { Theme } from "../theme.js";
 
 /**
  * Registry mapping type strings to descriptor class constructors
  */
 const descriptorRegistry = new Map<
   string,
-  new (props: any) => WidgetDescriptor
+  new (props: any, theme: Theme) => WidgetDescriptor
 >([
   ["box", BoxDescriptor],
   ["text", TextDescriptor],
@@ -33,16 +34,18 @@ const descriptorRegistry = new Map<
 ]);
 
 /**
- * Creates a descriptor instance for the given widget type and props.
+ * Creates a descriptor instance for the given widget type, props, and theme.
  *
  * @param type - Widget type string (e.g., 'box', 'text', 'button')
  * @param props - Props to pass to the descriptor
+ * @param theme - Theme to pass to the descriptor
  * @returns A WidgetDescriptor instance
  * @throws Error if the widget type is not registered
  */
 export function createDescriptor(
   type: string,
   props: any = {},
+  theme: Theme,
 ): WidgetDescriptor {
   const DescriptorClass = descriptorRegistry.get(type);
 
@@ -52,7 +55,7 @@ export function createDescriptor(
     );
   }
 
-  return new DescriptorClass(props);
+  return new DescriptorClass(props, theme);
 }
 
 /**
@@ -64,7 +67,7 @@ export function createDescriptor(
  *
  * @example
  * ```typescript
- * class MyCustomDescriptor extends WidgetDescriptor<MyCustomProps> {
+ * class MyCustomDescriptor extends WidgetDescriptor<MyCustomProps, Theme> {
  *   // ... implementation
  * }
  *
@@ -73,7 +76,7 @@ export function createDescriptor(
  */
 export function registerDescriptor(
   type: string,
-  descriptorClass: new (props: any) => WidgetDescriptor,
+  descriptorClass: new (props: any, theme: Theme) => WidgetDescriptor,
 ): void {
   descriptorRegistry.set(type, descriptorClass);
 }

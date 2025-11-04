@@ -13,6 +13,15 @@ Code modernization and cleanup tasks for @unblessed.
    Blink	5	\x1b[5m	25	\x1b[25m	This is BLINKING
    Reverse	7	\x1b[7m	27	\x1b[27m	This is REVERSED
    Hide	8	\x1b[7m	28	\x1b[28m	This is HIDDEN
+3. improve callback signature:
+       39 +    const handleKeyPress = (_ch: string, key: any) => {
+       40 +      if (key.name === "t") {
+       41 +        handleToggleTheme();
+       42 +      } else if (key.name === "q" || (key.ctrl && key.name === "c")) {
+       43 +        process.exit(0);
+       44 +      }
+       45 +    };
+       46
 
 
 ## High Priority

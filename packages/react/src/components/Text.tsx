@@ -3,9 +3,14 @@
  */
 
 import { type Screen, Text as TextWidget } from "@unblessed/core";
-import { ComputedLayout, WidgetDescriptor } from "@unblessed/layout";
+import {
+  ComputedLayout,
+  FlexboxProps,
+  WidgetDescriptor,
+} from "@unblessed/layout";
 import type { ReactNode } from "react";
 import { forwardRef, type PropsWithChildren } from "react";
+import type { Theme } from "../theme.js";
 import type { StyleObject } from "../widget-descriptors/common-props.js";
 import { buildTextStyles } from "../widget-descriptors/helpers.js";
 import { COMMON_WIDGET_OPTIONS } from "./Box";
@@ -13,7 +18,12 @@ import { COMMON_WIDGET_OPTIONS } from "./Box";
 /**
  * Props interface for Text component
  */
-export interface TextProps extends StyleObject {
+export interface TextProps
+  extends StyleObject,
+    Pick<
+      FlexboxProps,
+      "minHeight" | "height" | "width" | "minWidth" | "maxWidth" | "maxHeight"
+    > {
   content?: string;
   children?: ReactNode;
 }
@@ -21,19 +31,30 @@ export interface TextProps extends StyleObject {
 /**
  * Descriptor for Text widgets
  */
-export class TextDescriptor extends WidgetDescriptor<TextProps> {
+export class TextDescriptor extends WidgetDescriptor<TextProps, Theme> {
   readonly type = "text";
 
   get flexProps() {
-    // Text widgets don't have flex props - dimensions are calculated from content
-    return {};
+    const { width, height, minWidth, maxWidth, minHeight, maxHeight } =
+      this.props;
+
+    const flexboxProps: FlexboxProps = {};
+
+    if (width !== undefined) flexboxProps.width = width;
+    if (height !== undefined) flexboxProps.height = height;
+    if (minWidth !== undefined) flexboxProps.minWidth = minWidth;
+    if (minHeight !== undefined) flexboxProps.minHeight = minHeight;
+    if (maxWidth !== undefined) flexboxProps.maxWidth = maxWidth;
+    if (maxHeight !== undefined) flexboxProps.maxHeight = maxHeight;
+
+    return flexboxProps;
   }
 
   get widgetOptions() {
     const widgetOptions: any = {};
 
-    // Build text styles using helper function
-    const textStyles = buildTextStyles(this.props);
+    // Build text styles using helper function (pass theme for color resolution)
+    const textStyles = buildTextStyles(this.props, this.theme);
     if (textStyles) {
       widgetOptions.style = textStyles;
     }
@@ -86,7 +107,7 @@ export class TextDescriptor extends WidgetDescriptor<TextProps> {
 export const Text = forwardRef<any, PropsWithChildren<TextProps>>(
   ({ children, ...props }, ref) => {
     return (
-      <text ref={ref} {...props}>
+      <text ref={ref} minHeight={1} {...props}>
         {children}
       </text>
     );

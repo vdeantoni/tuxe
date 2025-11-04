@@ -24,6 +24,7 @@ import {
   type TextNode,
   updateNodeProps,
 } from "./dom.js";
+import { getCurrentTheme } from "./theme-registry.js";
 import { createDescriptor } from "./widget-descriptors";
 
 type Props = Record<string, unknown>;
@@ -83,9 +84,10 @@ const reconciler = createReconciler<
   // Node creation
   createInstance(type, props) {
     const manager = getLayoutManager();
+    const theme = getCurrentTheme();
 
-    // Create descriptor for this widget type with its props
-    const descriptor = createDescriptor(type, props);
+    // Create descriptor for this widget type with its props and theme
+    const descriptor = createDescriptor(type, props, theme);
 
     // Create LayoutNode using descriptor's extracted properties
     const layoutNode = manager.createNode(
@@ -187,8 +189,10 @@ const reconciler = createReconciler<
   commitUpdate(instance, _updatePayload, type, _oldProps, newProps) {
     updateNodeProps(instance, newProps);
 
-    // Create/update descriptor with new props
-    const descriptor = createDescriptor(type, newProps);
+    const theme = getCurrentTheme();
+
+    // Create/update descriptor with new props and theme
+    const descriptor = createDescriptor(type, newProps, theme);
 
     // Update layout node with new descriptor properties
     updateLayoutNode(instance.layoutNode, descriptor.flexProps);

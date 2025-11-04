@@ -10,6 +10,7 @@ import {
 } from "@unblessed/layout";
 import type { ReactNode } from "react";
 import { forwardRef, type PropsWithChildren } from "react";
+import type { Theme } from "../theme.js";
 import { InteractiveWidgetProps } from "../widget-descriptors";
 import {
   buildBorder,
@@ -47,7 +48,10 @@ export interface BoxProps extends InteractiveWidgetProps {
 /**
  * Descriptor for Box widgets
  */
-export class BoxDescriptor<T extends BoxProps> extends WidgetDescriptor<T> {
+export class BoxDescriptor<T extends BoxProps> extends WidgetDescriptor<
+  T,
+  Theme
+> {
   readonly type: string = "box";
 
   get flexProps(): FlexboxProps {
@@ -142,8 +146,8 @@ export class BoxDescriptor<T extends BoxProps> extends WidgetDescriptor<T> {
   get widgetOptions(): Record<string, any> {
     const widgetOptions: any = {};
 
-    // Build border using helper function
-    const border = buildBorder(this.props);
+    // Build border using helper function (pass theme for color resolution)
+    const border = buildBorder(this.props, this.theme);
     if (border) {
       widgetOptions.border = border;
       // Pre-populate style.border.fg
@@ -162,21 +166,27 @@ export class BoxDescriptor<T extends BoxProps> extends WidgetDescriptor<T> {
     // Box is not focusable by default (no defaultTabIndex)
     Object.assign(widgetOptions, buildFocusableOptions(this.props));
 
-    // Base/default state styling from direct props
+    // Base/default state styling from direct props (pass theme for color resolution)
     const defaultStyle = extractStyleProps(this.props);
-    const baseStyle = buildStyleObject(defaultStyle);
+    const baseStyle = buildStyleObject(defaultStyle, this.theme);
     if (Object.keys(baseStyle).length > 0) {
       widgetOptions.style = mergeStyles(widgetOptions.style, baseStyle);
     }
 
-    // Hover effects
+    // Hover effects (pass theme for color resolution)
     if (this.props.hover) {
-      widgetOptions.hoverEffects = buildStyleObject(this.props.hover);
+      widgetOptions.hoverEffects = buildStyleObject(
+        this.props.hover,
+        this.theme,
+      );
     }
 
-    // Focus effects
+    // Focus effects (pass theme for color resolution)
     if (this.props.focus) {
-      widgetOptions.focusEffects = buildStyleObject(this.props.focus);
+      widgetOptions.focusEffects = buildStyleObject(
+        this.props.focus,
+        this.theme,
+      );
     }
 
     // Content
