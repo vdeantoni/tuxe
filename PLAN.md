@@ -1008,8 +1008,16 @@ render(<App />);
   - Event cleanup on update/unmount
   - Text content concatenation fix (multiple #text children)
   - 6 event tests + 2 content update tests passing
+- [x] ✅ Hover/focus state preservation during re-renders
+  - **Critical fix**: Hover effects now persist during React re-renders
+  - Deep cloning prevents shared style object mutations between widgets
+  - Temp storage updates ensure correct restoration on mouseout/blur
+  - Enables hover effects with onMouseMove handlers (critical for interactive UIs)
+  - 5 comprehensive tests added (hover persistence, focus persistence, simultaneous effects, etc.)
+  - All 45 layout tests passing
+  - Location: `packages/layout/src/widget-descriptor.ts`
 - [ ] ⚠️ Unit tests (PARTIAL)
-  - 12 tests total (4 render + 6 event + 2 content update)
+  - 17 tests total (4 render + 6 event + 2 content update + 5 hover/focus)
   - Need more component tests (layout, props, edge cases)
 - [ ] ⚠️ Integration tests (NEEDED)
   - Layout calculations
@@ -1017,7 +1025,7 @@ render(<App />);
   - Complex event scenarios
 - [ ] ⚠️ Test coverage target (NEEDED)
   - Goal: 70%+ coverage
-  - Current: ~30% (estimated)
+  - Current: ~35% (estimated)
 
 ### Phase 6: Future Enhancements 📋 **PLANNED**
 - [ ] Hooks (useInput, useApp, useFocus) - **NEXT PRIORITY**
@@ -1107,6 +1115,10 @@ Event system foundation is complete. Now implement hooks for global event handli
 **Location:** `packages/react/src/wrap-text.ts`, `packages/react/src/measure-text.ts`
 
 #### 4. **Bug Fixes** 🐛
+- [x] ✅ Fix hover/focus effects lost on re-render (2025-11-03)
+  - Fixed widget style being overwritten during React re-renders
+  - Added deep cloning to prevent shared style object mutations
+  - 5 comprehensive tests ensure effects persist correctly
 - [ ] Fix focus navigation edge cases (seen in focus-navigation.test.js)
 - [ ] Verify padding calculations are correct
 - [ ] Test with different terminal sizes
@@ -1148,6 +1160,7 @@ Wrap existing unblessed widgets as React components:
 
 ---
 
-**Last Updated**: 2025-11-01
-**Status**: MVP functionally complete with event handling
+**Last Updated**: 2025-11-03
+**Status**: MVP functionally complete with event handling and state management
+**Recent**: Fixed critical hover/focus state preservation bug
 **Next Milestone**: Hooks + comprehensive tests → v1.0.0 release candidate
