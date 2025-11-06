@@ -2,10 +2,9 @@
  * Vite plugin for @unblessed/browser
  *
  * Optional plugin that provides optimized build configuration for @unblessed/browser in Vite projects.
- * Configures dependency optimization and module resolution for better dev/build performance.
  *
- * Note: This plugin is OPTIONAL. @unblessed/browser works without it, but the plugin
- * provides optimizations for Vite users.
+ * NOTE: This plugin is now OPTIONAL and provides minimal optimizations.
+ * @unblessed/browser works fine without it since BrowserRuntime handles all polyfills.
  *
  * Usage:
  * ```ts
@@ -18,17 +17,9 @@
  * ```
  */
 
-import { dirname, resolve } from "path";
-import { fileURLToPath } from "url";
 import type { Plugin, UserConfig } from "vite";
 
 export interface BlessedBrowserPluginOptions {
-  /**
-   * Whether to apply Node.js polyfill aliases
-   * @default true
-   */
-  polyfills?: boolean;
-
   /**
    * Whether to optimize dependencies
    * @default true
@@ -39,45 +30,22 @@ export interface BlessedBrowserPluginOptions {
 export default function blessedBrowserPlugin(
   options: BlessedBrowserPluginOptions = {},
 ): Plugin {
-  const { polyfills = true, optimizeDeps = true } = options;
+  const { optimizeDeps = true } = options;
 
   return {
-    name: "vite-plugin-tui-browser",
+    name: "vite-plugin-unblessed-browser",
 
     config(): UserConfig {
-      // Get absolute path to polyfills directory
-      const __filename = fileURLToPath(import.meta.url);
-      const __dirname = dirname(__filename);
-
-      // Try to find the package root by looking for src or going up
-      let polyfillsPath: string;
-      if (__dirname.includes("/src/")) {
-        // Development mode - resolve from src
-        polyfillsPath = resolve(__dirname, "../polyfills");
-      } else {
-        // Production mode - resolve from dist back to src
-        polyfillsPath = resolve(__dirname, "../../src/polyfills");
-      }
-
-      const resolveAliases = polyfills
-        ? ({
-            // Map Node.js built-ins to browser polyfills with absolute paths
-            fs: resolve(polyfillsPath, "fs.ts"),
-            child_process: resolve(polyfillsPath, "empty.ts"),
-            net: resolve(polyfillsPath, "empty.ts"),
-            tty: resolve(polyfillsPath, "tty.ts"),
-            module: resolve(polyfillsPath, "module.ts"),
-            zlib: resolve(polyfillsPath, "empty.ts"),
-            url: resolve(polyfillsPath, "empty.ts"),
-            pngjs: resolve(polyfillsPath, "pngjs.ts"),
-          } as const)
-        : undefined;
-
       const optimizeDepsConfig = optimizeDeps
         ? {
-            // Don't pre-bundle @unblessed/browser - it's already bundled
-            exclude: ["@unblessed/browser"],
-            include: ["@unblessed/core"],
+            include: [
+              "@unblessed/core",
+              "@unblessed/react",
+              "react",
+              "buffer",
+              "events",
+              "path-browserify",
+            ],
             esbuildOptions: {
               define: {
                 global: "globalThis",
@@ -87,11 +55,6 @@ export default function blessedBrowserPlugin(
         : undefined;
 
       return {
-        resolve: {
-          alias: resolveAliases,
-          mainFields: ["module", "browser", "main"],
-          conditions: ["import", "module", "browser", "default"],
-        },
         optimizeDeps: optimizeDepsConfig,
       };
     },

@@ -27,6 +27,14 @@ export class WriteStream {
   }
 }
 
+export function createTTY() {
+  return {
+    isatty,
+    ReadStream,
+    WriteStream,
+  };
+}
+
 export default {
   isatty,
   ReadStream,

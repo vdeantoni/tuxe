@@ -1,26 +1,38 @@
 /**
- * @unblessed/browser - Browser runtime for Tui
+ * @unblessed/browser - Browser runtime for unblessed
  *
  * Provides browser-compatible runtime for @unblessed/core with XTerm.js integration.
  *
  * ## Usage
  *
  * ```typescript
- * import { Screen, Box } from '@unblessed/browser';
+ * import { BrowserRuntime } from '@unblessed/browser';
+ * import { render, Box, Text } from '@unblessed/react';
  * import { Terminal } from 'xterm';
  *
+ * // Create terminal
  * const term = new Terminal();
  * term.open(document.getElementById('terminal')!);
  *
- * // Screen automatically handles xterm.js integration
- * const screen = new Screen({ terminal: term });
- * const box = new Box({ parent: screen, content: 'Hello!' });
- * screen.render();
+ * // Create runtime
+ * const runtime = new BrowserRuntime();
+ *
+ * // Render your app
+ * render(
+ *   <Box>
+ *     <Text>Hello from unblessed in the browser!</Text>
+ *   </Box>,
+ *   { runtime }
+ * );
  * ```
  */
 
-// Initialize runtime BEFORE importing @unblessed/core (critical!)
-import "./runtime/auto-init.js";
+// CRITICAL: Set up minimal globals BEFORE any imports
+import "./runtime/globals.js";
+
+// Export BrowserRuntime for explicit initialization
+export type { Runtime } from "@unblessed/core";
+export { BrowserRuntime } from "./runtime/browser-runtime.js";
 
 // Re-export everything from core EXCEPT Screen
 export * from "@unblessed/core";
