@@ -4,6 +4,33 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>unblessed-browser Playground</title>
+
+    <!-- Setup globals BEFORE any module loads -->
+    <script type="module">
+      // Import Buffer first
+      import { Buffer } from "https://esm.sh/buffer@6.0.3";
+
+      // Set up minimal globals
+      if (typeof globalThis.process === "undefined") {
+        globalThis.process = {
+          platform: "browser",
+          env: { TERM: "xterm-256color" },
+          cwd: () => "/",
+          nextTick: (fn, ...args) => setTimeout(() => fn(...args), 0),
+        };
+      }
+
+      if (typeof globalThis.Buffer === "undefined") {
+        globalThis.Buffer = Buffer;
+      }
+
+      if (!globalThis.global) {
+        globalThis.global = globalThis;
+      }
+
+      console.log("[Init] Globals initialized before modules load");
+    </script>
+
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.css"
@@ -224,12 +251,11 @@
         <select id="example-selector">
           <option value="">Select an example...</option>
           <option value="Simple Box">Simple Box</option>
-          <option value="Interactive List">Interactive List</option>
+          <option value="Interactive Counter">Interactive Counter</option>
           <option value="Form Input">Form Input</option>
-          <option value="Table">Table</option>
-          <option value="Layout">Layout</option>
+          <option value="Interactive List">Interactive List</option>
+          <option value="Layout Demo">Layout Demo</option>
           <option value="Animation">Animation</option>
-          <option value="BigText">BigText</option>
           <option value="Full Demo">Full Demo</option>
         </select>
         <button id="clear-btn" class="secondary">Clear</button>
@@ -269,8 +295,8 @@
     <script type="module">
       import { Terminal } from "https://cdn.jsdelivr.net/npm/xterm@5.3.0/+esm";
       import { FitAddon } from "https://cdn.jsdelivr.net/npm/@xterm/addon-fit@0.10.0/+esm";
-      import { BlessedPlayground } from "./playground.js";
-      import examples from "./examples.js";
+      import { BlessedPlayground } from "./src/index.ts";
+      import examplesReact from "./examples-react.js";
 
       // Initialize playground with 300ms debounce
       const playground = new BlessedPlayground(
@@ -287,7 +313,7 @@
       const exampleSelector = document.getElementById("example-selector");
 
       // Load default example
-      codeEditor.value = examples["Simple Box"];
+      codeEditor.value = examplesReact["Simple Box"];
 
       // Auto-run on code changes (debounced)
       codeEditor.addEventListener("input", () => {
@@ -300,8 +326,9 @@
       // Handle example selection
       exampleSelector.addEventListener("change", (e) => {
         const exampleName = e.target.value;
-        if (exampleName && examples[exampleName]) {
-          codeEditor.value = examples[exampleName];
+
+        if (exampleName && examplesReact[exampleName]) {
+          codeEditor.value = examplesReact[exampleName];
           // Run immediately when example is selected
           playground.run(codeEditor.value);
           // Reset selector to placeholder

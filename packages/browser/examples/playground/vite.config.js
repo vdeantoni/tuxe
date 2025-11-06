@@ -1,9 +1,28 @@
 import { defineConfig } from "vite";
-import blessedBrowser from "../../dist/vite-plugin";
 
 export default defineConfig({
-  plugins: [blessedBrowser()],
   server: {
     port: 3000,
+  },
+  optimizeDeps: {
+    include: [
+      "util",
+      "stream-browserify",
+      "path-browserify",
+      "buffer",
+      "events",
+    ],
+  },
+  resolve: {
+    alias: {
+      // Ensure util and stream use bundled versions
+      util: "util",
+      stream: "stream-browserify",
+    },
+  },
+  // Handle TypeScript with ESM imports from CDN
+  esbuild: {
+    // Keep JSX preservation since we transform at runtime
+    jsx: "preserve",
   },
 });
