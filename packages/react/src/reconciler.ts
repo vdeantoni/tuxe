@@ -188,6 +188,15 @@ const reconciler = createReconciler<
     );
   },
 
+  // Determine if instance needs update
+  prepareUpdate(_instance, _type, oldProps, newProps) {
+    // Return true to signal that an update should happen
+    // The actual update is performed in commitUpdate
+    // We could do a deep comparison here to avoid unnecessary updates,
+    // but for now we always update when props change
+    return oldProps !== newProps ? true : null;
+  },
+
   commitUpdate(instance, _updatePayload, type, _oldProps, newProps) {
     updateNodeProps(instance, newProps);
 

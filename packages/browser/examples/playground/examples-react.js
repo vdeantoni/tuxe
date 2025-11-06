@@ -5,7 +5,6 @@
 
 export const examplesReact = {
   "Simple Box": `// Simple centered box with React
-const { useState } = React;
 const { Box, Text, render } = tui;
 
 const App = () => {
@@ -34,12 +33,12 @@ const App = () => {
   );
 };
 
-// Pass BOTH runtime and screen to render
-render(<App />, { runtime: new tui.BrowserRuntime(), screen });`,
+// Render with screen and runtime
+render(<App />, { screen, runtime });`,
 
   "Interactive Counter": `// Interactive counter with buttons
 const { useState } = React;
-const { Box, Text, Button, render, BrowserRuntime } = tui;
+const { Box, Text, Button, render } = tui;
 
 const App = () => {
   const [count, setCount] = useState(0);
@@ -90,12 +89,12 @@ const App = () => {
   );
 };
 
-// Pass screen to render (runtime is already set globally by playground)
-render(<App />, { runtime: new BrowserRuntime(), screen });`,
+// Render with screen and runtime
+render(<App />, { screen, runtime });`,
 
   "Form Input": `// Form with text input
 const { useState } = React;
-const { Box, Text, Input, Button, render, BrowserRuntime } = tui;
+const { Box, Text, Input, Button, render } = tui;
 
 const App = () => {
   const [name, setName] = useState('');
@@ -172,12 +171,12 @@ const App = () => {
   );
 };
 
-// Pass screen to render (runtime is already set globally by playground)
-render(<App />, { runtime: new BrowserRuntime(), screen });`,
+// Render with screen and runtime
+render(<App />, { screen, runtime });`,
 
   "Interactive List": `// Interactive list with selection
 const { useState } = React;
-const { Box, Text, List, render, BrowserRuntime } = tui;
+const { Box, Text, List, render } = tui;
 
 const App = () => {
   const [selected, setSelected] = useState('None');
@@ -223,12 +222,12 @@ const App = () => {
   );
 };
 
-// Pass screen to render (runtime is already set globally by playground)
-render(<App />, { runtime: new BrowserRuntime(), screen });`,
+// Render with screen and runtime
+render(<App />, { screen, runtime });`,
 
   "Layout Demo": `// Multi-pane layout
 const { useState } = React;
-const { Box, Text, List, render, BrowserRuntime } = tui;
+const { Box, Text, List, render } = tui;
 
 const App = () => {
   const [selectedMenu, setSelectedMenu] = useState('Dashboard');
@@ -293,12 +292,12 @@ const App = () => {
   );
 };
 
-// Pass screen to render (runtime is already set globally by playground)
-render(<App />, { runtime: new BrowserRuntime(), screen });`,
+// Render with screen and runtime
+render(<App />, { screen, runtime });`,
 
   Animation: `// Animated progress bar
 const { useState, useEffect } = React;
-const { Box, Text, render, BrowserRuntime } = tui;
+const { Box, Text, render } = tui;
 
 const App = () => {
   const [progress, setProgress] = useState(0);
@@ -370,12 +369,12 @@ const App = () => {
   );
 };
 
-// Pass screen to render (runtime is already set globally by playground)
-render(<App />, { runtime: new BrowserRuntime(), screen });`,
+// Render with screen and runtime
+render(<App />, { screen, runtime });`,
 
   "Full Demo": `// Complete interactive demo
 const { useState, useEffect } = React;
-const { Box, Text, List, Button, render, BrowserRuntime } = tui;
+const { Box, Text, List, Button, render } = tui;
 
 const DemoContent = ({ demoIndex }) => {
   const [counter, setCounter] = useState(0);
@@ -530,8 +529,8 @@ const App = () => {
   );
 };
 
-// Pass screen to render (runtime is already set globally by playground)
-render(<App />, { runtime: new BrowserRuntime(), screen });`,
+// Render with screen and runtime
+render(<App />, { screen, runtime });`,
 };
 
 export default examplesReact;

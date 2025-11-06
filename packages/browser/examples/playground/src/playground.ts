@@ -3,7 +3,6 @@
  */
 
 import { transform } from "https://esm.sh/@babel/standalone@7.23.5";
-import React from "https://esm.sh/react@18.3.1";
 import * as tuiReact from "../../../../react/dist/index.js";
 import * as tui from "../../../dist/index.js";
 
@@ -11,6 +10,9 @@ import { CodeExecutor } from "./code-executor.js";
 import { JSXTransformer } from "./jsx-transformer.js";
 import { TerminalManager } from "./terminal-manager.js";
 import type { PlaygroundOptions } from "./types.js";
+
+// Get React from tuiReact to ensure same instance
+const React = tuiReact.React;
 
 /**
  * Interactive playground for @unblessed/browser
@@ -34,10 +36,21 @@ export class BlessedPlayground {
 
     // Initialize BrowserRuntime once for the playground
     this.runtime = new tui.BrowserRuntime();
+    console.log("[Playground] Created BrowserRuntime:", this.runtime);
 
     // Set the runtime globally so Screen can access it
     const { setRuntime } = tui;
     setRuntime(this.runtime);
+    console.log("[Playground] Runtime set globally");
+
+    // Verify runtime was set
+    const { getRuntime } = tui;
+    try {
+      const currentRuntime = getRuntime();
+      console.log("[Playground] Verified runtime is accessible:", !!currentRuntime);
+    } catch (e) {
+      console.error("[Playground] Failed to verify runtime:", e);
+    }
   }
 
   /**
@@ -46,8 +59,14 @@ export class BlessedPlayground {
   init(): void {
     const terminal = this.terminalManager.init();
 
-    // Initialize code executor with terminal
-    this.codeExecutor = new CodeExecutor(terminal!, tui, tuiReact, React);
+    // Initialize code executor with terminal and runtime
+    this.codeExecutor = new CodeExecutor(
+      terminal!,
+      tui,
+      tuiReact,
+      React,
+      this.runtime,
+    );
   }
 
   /**
@@ -82,9 +101,17 @@ export class BlessedPlayground {
       const { code: transformedCode, isJSX } =
         this.jsxTransformer.process(code);
 
+      // Log for debugging
+      console.log("[Playground] Running code, isJSX:", isJSX);
+
       // Execute the code
       await this.codeExecutor.execute(transformedCode, isJSX);
+
+      console.log("[Playground] Code executed successfully");
     } catch (error: any) {
+      // Log to console for debugging
+      console.error("[Playground] Error executing code:", error);
+
       // Display error
       this.terminalManager.showError(error);
     }

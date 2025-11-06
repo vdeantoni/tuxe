@@ -27,6 +27,9 @@
  * @packageDocumentation
  */
 
+// Export React so consumers use the same instance
+export { default as React } from "react";
+
 // Components
 export { BigText, type BigTextProps } from "./components/BigText.js";
 export { Box, type BoxProps } from "./components/Box.js";

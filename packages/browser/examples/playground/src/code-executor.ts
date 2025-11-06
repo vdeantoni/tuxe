@@ -16,18 +16,28 @@ export class CodeExecutor {
   private tui: any;
   private tuiReact: any;
   private React: any;
+  private runtime: any;
 
-  constructor(terminal: Terminal, tui: any, tuiReact: any, React: any) {
+  constructor(
+    terminal: Terminal,
+    tui: any,
+    tuiReact: any,
+    React: any,
+    runtime: any,
+  ) {
     this.terminal = terminal;
     this.tui = tui;
     this.tuiReact = tuiReact;
     this.React = React;
+    this.runtime = runtime;
   }
 
   /**
    * Execute user code
    */
   async execute(code: string, isJSX: boolean): Promise<void> {
+    console.log("[CodeExecutor] Starting execution, isJSX:", isJSX);
+
     // Clear previous timers
     this.clearTimers();
 
@@ -42,9 +52,11 @@ export class CodeExecutor {
     }
 
     // Create new screen for the playground
+    console.log("[CodeExecutor] Creating screen...");
     this.screen = new this.tui.Screen({
       terminal: this.terminal,
     });
+    console.log("[CodeExecutor] Screen created:", !!this.screen);
 
     // Handle quit key
     this.screen.key(["escape", "q", "C-c"], () => {
@@ -65,14 +77,18 @@ export class CodeExecutor {
     };
 
     if (isJSX) {
+      console.log("[CodeExecutor] Executing in React mode");
       await this.executeReactMode(code, wrappedSetInterval, wrappedSetTimeout);
     } else {
+      console.log("[CodeExecutor] Executing in classic mode");
       await this.executeClassicMode(
         code,
         wrappedSetInterval,
         wrappedSetTimeout,
       );
     }
+
+    console.log("[CodeExecutor] Execution completed");
   }
 
   /**
@@ -83,70 +99,42 @@ export class CodeExecutor {
     wrappedSetInterval: Function,
     wrappedSetTimeout: Function,
   ): Promise<void> {
+    console.log("[CodeExecutor] executeReactMode: Starting");
+
     // Merge tui with React components for convenience
     const tuiWithReact = {
       ...this.tui,
       ...this.tuiReact,
     };
+    console.log("[CodeExecutor] executeReactMode: Merged tui with React");
 
-    // Destructure React hooks explicitly
-    const {
-      useState,
-      useEffect,
-      useCallback,
-      useMemo,
-      useRef,
-      useContext,
-      useReducer,
-      useLayoutEffect,
-      useImperativeHandle,
-      useDebugValue,
-    } = this.React;
-
-    // Create a function with access to all React hooks and tui
+    // Create a function with access to React and tui
+    console.log("[CodeExecutor] executeReactMode: Creating user function");
     const userFunction = new Function(
       "React",
       "tui",
       "screen",
+      "runtime",
       "setInterval",
       "setTimeout",
       "clearInterval",
       "clearTimeout",
-      // React hooks as individual parameters
-      "useState",
-      "useEffect",
-      "useCallback",
-      "useMemo",
-      "useRef",
-      "useContext",
-      "useReducer",
-      "useLayoutEffect",
-      "useImperativeHandle",
-      "useDebugValue",
       code,
     );
 
-    // Execute with all hooks available
+    // Execute user code
+    console.log("[CodeExecutor] executeReactMode: Executing user function");
     await userFunction(
       this.React,
       tuiWithReact,
       this.screen,
+      this.runtime,
       wrappedSetInterval,
       wrappedSetTimeout,
       clearInterval,
       clearTimeout,
-      // Pass hooks explicitly
-      useState,
-      useEffect,
-      useCallback,
-      useMemo,
-      useRef,
-      useContext,
-      useReducer,
-      useLayoutEffect,
-      useImperativeHandle,
-      useDebugValue,
     );
+    console.log("[CodeExecutor] executeReactMode: User function executed");
   }
 
   /**
