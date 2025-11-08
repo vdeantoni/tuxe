@@ -1,3 +1,12 @@
+# [1.0.0-alpha.20](https://github.com/vdeantoni/unblessed/compare/v1.0.0-alpha.19...v1.0.0-alpha.20) (2025-11-08)
+
+
+### Features
+
+* **core:** add comprehensive animation system ([e35b581](https://github.com/vdeantoni/unblessed/commit/e35b58164dcf24afc6d51899b5c261dba8a307dd))
+* **react:** add canvas components and enhanced ref support ([358b315](https://github.com/vdeantoni/unblessed/commit/358b315113dbd64369da6dfb92fe713bff8ca0cf))
+* **react:** optimize and finalize declarative animation system ([7f9dfe8](https://github.com/vdeantoni/unblessed/commit/7f9dfe8d7bb17390f755ddfb7582e466602d4b86))
+
 # [1.0.0-alpha.19](https://github.com/vdeantoni/unblessed/compare/v1.0.0-alpha.18...v1.0.0-alpha.19) (2025-11-06)
 
 

@@ -1,7 +1,7 @@
 {
   "name": "@unblessed/vrt",
   "description": "Visual Regression Testing tools for @unblessed terminal UI applications",
-  "version": "1.0.0-alpha.19",
+  "version": "1.0.0-alpha.20",
   "author": "Vinicius De Antoni <vdeantoni@gmail.com>",
   "license": "MIT",
   "publishConfig": {
