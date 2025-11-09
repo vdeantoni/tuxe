@@ -14,6 +14,15 @@ import type {
 } from "./common.js";
 import type { ListElementStyle, StyleListTable } from "./style.js";
 
+/**
+ * Text wrapping mode (inspired by ink)
+ */
+export type TextWrapMode =
+  | "wrap" // Word wrap (default)
+  | "truncate-end" // Truncate at end with ellipsis: "Hello W…"
+  | "truncate-middle" // Truncate in middle with ellipsis: "Hel…rld"
+  | "truncate-start"; // Truncate at start with ellipsis: "…World"
+
 // Forward declarations for circular dependencies
 export type Screen = any;
 export type BlessedElement = any;
@@ -270,6 +279,19 @@ export interface ElementOptions
    * Wrap text if it exceeds width.
    */
   wrap?: boolean;
+
+  /**
+   * Text wrapping/truncation mode (ink-style).
+   * Takes precedence over wrap property if set.
+   *
+   * - 'wrap': Word wrap text to multiple lines (default behavior)
+   * - 'truncate-end': Truncate at end with ellipsis: "Hello W…"
+   * - 'truncate-middle': Truncate in middle with ellipsis: "Hel…rld"
+   * - 'truncate-start': Truncate at start with ellipsis: "…World"
+   *
+   * If undefined, uses legacy wrap boolean behavior.
+   */
+  textWrap?: TextWrapMode;
 
   /**
    * Amount of padding on the inside of the element. Can be a number or an object containing

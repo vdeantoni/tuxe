@@ -10,7 +10,9 @@ import { getBorderChars } from "../lib/border-styles.js";
 import colors from "../lib/colors.js";
 import helpers from "../lib/helpers.js";
 import { getEnvVar, getNextTick } from "../lib/runtime-helpers.js";
+import { truncateText } from "../lib/text-utils.js";
 import unicode from "../lib/unicode.js";
+import { getGlobalWrapCache } from "../lib/wrap-cache.js";
 import {
   makeAnimatable,
   type AnimatableMethods,
@@ -27,6 +29,7 @@ import type {
   RenderCoords,
   ScrollbarConfig,
   Style,
+  TextWrapMode,
   TrackConfig,
 } from "../types";
 import Node from "./node.js";
@@ -68,6 +71,7 @@ class Element extends Node {
   align: string;
   valign: string;
   wrap: boolean;
+  textWrap?: TextWrapMode;
   shrink?: boolean;
   ch: string;
   /** Padding configuration for all sides */
@@ -179,6 +183,7 @@ class Element extends Node {
     this.align = options.align || "left";
     this.valign = options.valign || "top";
     this.wrap = options.wrap !== false;
+    this.textWrap = options.textWrap;
     this.shrink = options.shrink;
     this.ch = options.ch || " ";
 
@@ -838,25 +843,37 @@ class Element extends Node {
   _wrapContent(content: string, width: number): WrappedContent {
     const tags = this.parseTags;
     let state = this.align;
-    const wrap = this.wrap;
     let margin = 0;
-    const rtof: any[] = [];
-    const ftor: any[] = [];
-    const out: string[] = [];
-    let no = 0;
-    let line: string;
-    let align: any;
-    let cap: any;
-    let total: number;
-    let i: number;
-    let part: string;
-    let j: number;
-    let lines: string[];
-    let rest: any;
 
-    lines = content.split("\n");
+    // Determine wrapping mode
+    // textWrap takes precedence over legacy wrap boolean
+    let wrapMode: TextWrapMode | boolean;
+    if (this.textWrap) {
+      wrapMode = this.textWrap;
+    } else {
+      wrapMode = this.wrap;
+    }
 
+    // Check cache
+    const cache = getGlobalWrapCache();
+    const cacheKey = {
+      content,
+      width,
+      wrapMode,
+      fullUnicode: this.screen.fullUnicode,
+      align: this.align,
+      parseTags: !!this.parseTags,
+    };
+
+    const cached = cache.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    // Early return for empty content
     if (!content) {
+      const lines = content.split("\n");
+      const out: string[] = [];
       out.push(content);
       const wrappedOut = out as WrappedContent;
       wrappedOut.rtof = [0];
@@ -864,85 +881,160 @@ class Element extends Node {
       wrappedOut.fake = lines;
       wrappedOut.real = out;
       wrappedOut.mwidth = 0;
+      cache.set(cacheKey, wrappedOut);
       return wrappedOut;
     }
 
+    // Account for scrollbar and textarea margin
     if (this.scrollbar) margin++;
     if (this.type === "textarea") margin++;
     if (width > margin) width -= margin;
 
-    main: for (; no < lines.length; no++) {
-      line = lines[no];
-      align = state;
+    const lines = content.split("\n");
+    const rtof: any[] = [];
+    const ftor: any[] = [];
+    const out: string[] = [];
 
-      ftor.push([]);
+    // Handle truncation modes (ink-style)
+    if (
+      wrapMode === "truncate-end" ||
+      wrapMode === "truncate-middle" ||
+      wrapMode === "truncate-start"
+    ) {
+      // Simple truncation: each line is truncated independently
+      for (let no = 0; no < lines.length; no++) {
+        let line = lines[no];
+        let align = state;
 
-      // Handle alignment tags.
-      if (tags) {
-        if ((cap = /^{(left|center|right)}/.exec(line))) {
-          line = line.substring(cap[0].length);
-          align = state = cap[1] !== "left" ? cap[1] : null;
-        }
-        if ((cap = /{\/(left|center|right)}$/.exec(line))) {
-          line = line.slice(0, -cap[0].length);
-          //state = null;
-          state = this.align;
-        }
-      }
+        ftor.push([]);
 
-      // If the string is apparently too long, wrap it.
-      while (line.length > width) {
-        // Measure the real width of the string.
-        for (i = 0, total = 0; i < line.length; i++) {
-          while (line[i] === "\x1b") {
-            while (line[i] && line[i++] !== "m");
+        // Handle alignment tags
+        if (tags) {
+          let cap: any;
+          if ((cap = /^{(left|center|right)}/.exec(line))) {
+            line = line.substring(cap[0].length);
+            align = state = cap[1] !== "left" ? cap[1] : null;
           }
-          if (!line[i]) break;
-          if (++total === width) {
-            // If we're not wrapping the text, we have to finish up the rest of
-            // the control sequences before cutting off the line.
-            i++;
-            if (!wrap) {
-              rest = line.substring(i).match(/\x1b\[[^m]*m/g);
-              rest = rest ? rest.join("") : "";
-              out.push(this._align(line.substring(0, i) + rest, width, align));
-              ftor[no].push(out.length - 1);
-              rtof.push(no);
-              continue main;
+          if ((cap = /{\/(left|center|right)}$/.exec(line))) {
+            line = line.slice(0, -cap[0].length);
+            state = this.align;
+          }
+        }
+
+        // Truncate line
+        const position =
+          wrapMode === "truncate-end"
+            ? "end"
+            : wrapMode === "truncate-middle"
+              ? "middle"
+              : "start";
+
+        const truncated = truncateText(line, width, {
+          position,
+          fullUnicode: this.screen.fullUnicode,
+        });
+
+        out.push(this._align(truncated, width, align));
+        ftor[no].push(out.length - 1);
+        rtof.push(no);
+      }
+    } else {
+      // Legacy wrapping logic (word wrap or hard truncate)
+      const wrap = wrapMode === "wrap" || wrapMode === true;
+      let no = 0;
+      let line: string;
+      let align: any;
+      let cap: any;
+      let total: number;
+      let i: number;
+      let part: string;
+      let j: number;
+      let rest: any;
+
+      main: for (; no < lines.length; no++) {
+        line = lines[no];
+        align = state;
+
+        ftor.push([]);
+
+        // Handle alignment tags.
+        if (tags) {
+          if ((cap = /^{(left|center|right)}/.exec(line))) {
+            line = line.substring(cap[0].length);
+            align = state = cap[1] !== "left" ? cap[1] : null;
+          }
+          if ((cap = /{\/(left|center|right)}$/.exec(line))) {
+            line = line.slice(0, -cap[0].length);
+            //state = null;
+            state = this.align;
+          }
+        }
+
+        // If the string is apparently too long, wrap it.
+        while (line.length > width) {
+          // Measure the real width of the string.
+          for (i = 0, total = 0; i < line.length; i++) {
+            while (line[i] === "\x1b") {
+              while (line[i] && line[i++] !== "m");
             }
-            if (!this.screen.fullUnicode) {
-              // Try to find a space to break on.
-              if (i !== line.length) {
-                j = i;
-                while (j > i - 10 && j > 0 && line[--j] !== " ");
-                if (line[j] === " ") i = j + 1;
+            if (!line[i]) break;
+            if (++total === width) {
+              // If we're not wrapping the text, we have to finish up the rest of
+              // the control sequences before cutting off the line.
+              i++;
+              if (!wrap) {
+                rest = line.substring(i).match(/\x1b\[[^m]*m/g);
+                rest = rest ? rest.join("") : "";
+                out.push(
+                  this._align(line.substring(0, i) + rest, width, align),
+                );
+                ftor[no].push(out.length - 1);
+                rtof.push(no);
+                continue main;
               }
-            } else {
-              // Try to find a character to break on.
-              if (i !== line.length) {
-                // <XXX>
-                // Compensate for surrogate length
-                // counts on wrapping (experimental):
-                // NOTE: Could optimize this by putting
-                // it in the parent for loop.
-                if (unicode.isSurrogate(line, i)) i--;
-                let s = 0,
-                  n = 0;
-                for (; n < i; n++) {
-                  if (unicode.isSurrogate(line, n)) {
-                    s++;
-                    n++;
-                  }
+              if (!this.screen.fullUnicode) {
+                // Try to find a space to break on.
+                if (i !== line.length) {
+                  j = i;
+                  while (j > i - 10 && j > 0 && line[--j] !== " ");
+                  if (line[j] === " ") i = j + 1;
                 }
-                i += s;
-                // </XXX>
-                j = i;
-                // Break _past_ space.
-                // Break _past_ double-width chars.
-                // Break _past_ surrogate pairs.
-                // Break _past_ combining chars.
-                while (j > i - 10 && j > 0) {
-                  j--;
+              } else {
+                // Try to find a character to break on.
+                if (i !== line.length) {
+                  // <XXX>
+                  // Compensate for surrogate length
+                  // counts on wrapping (experimental):
+                  // NOTE: Could optimize this by putting
+                  // it in the parent for loop.
+                  if (unicode.isSurrogate(line, i)) i--;
+                  let s = 0,
+                    n = 0;
+                  for (; n < i; n++) {
+                    if (unicode.isSurrogate(line, n)) {
+                      s++;
+                      n++;
+                    }
+                  }
+                  i += s;
+                  // </XXX>
+                  j = i;
+                  // Break _past_ space.
+                  // Break _past_ double-width chars.
+                  // Break _past_ surrogate pairs.
+                  // Break _past_ combining chars.
+                  while (j > i - 10 && j > 0) {
+                    j--;
+                    if (
+                      line[j] === " " ||
+                      line[j] === "\x03" ||
+                      (unicode.isSurrogate(line, j - 1) &&
+                        line[j + 1] !== "\x03") ||
+                      unicode.isCombining(line, j)
+                    ) {
+                      break;
+                    }
+                  }
                   if (
                     line[j] === " " ||
                     line[j] === "\x03" ||
@@ -950,47 +1042,39 @@ class Element extends Node {
                       line[j + 1] !== "\x03") ||
                     unicode.isCombining(line, j)
                   ) {
-                    break;
+                    i = j + 1;
                   }
                 }
-                if (
-                  line[j] === " " ||
-                  line[j] === "\x03" ||
-                  (unicode.isSurrogate(line, j - 1) &&
-                    line[j + 1] !== "\x03") ||
-                  unicode.isCombining(line, j)
-                ) {
-                  i = j + 1;
-                }
               }
+              break;
             }
-            break;
+          }
+
+          part = line.substring(0, i);
+          line = line.substring(i);
+
+          out.push(this._align(part, width, align));
+          ftor[no].push(out.length - 1);
+          rtof.push(no);
+
+          // Make sure we didn't wrap the line to the very end, otherwise
+          // we get a pointless empty line after a newline.
+          if (line === "") continue main;
+
+          // If only an escape code got cut off, at it to `part`.
+          if (/^(?:\x1b[\[\d;]*m)+$/.test(line)) {
+            out[out.length - 1] += line;
+            continue main;
           }
         }
 
-        part = line.substring(0, i);
-        line = line.substring(i);
-
-        out.push(this._align(part, width, align));
+        out.push(this._align(line, width, align));
         ftor[no].push(out.length - 1);
         rtof.push(no);
-
-        // Make sure we didn't wrap the line to the very end, otherwise
-        // we get a pointless empty line after a newline.
-        if (line === "") continue main;
-
-        // If only an escape code got cut off, at it to `part`.
-        if (/^(?:\x1b[\[\d;]*m)+$/.test(line)) {
-          out[out.length - 1] += line;
-          continue main;
-        }
       }
-
-      out.push(this._align(line, width, align));
-      ftor[no].push(out.length - 1);
-      rtof.push(no);
     }
 
+    // Build result
     const wrappedOut = out as WrappedContent;
     wrappedOut.rtof = rtof;
     wrappedOut.ftor = ftor;
@@ -1001,6 +1085,9 @@ class Element extends Node {
       line = line.replace(/\x1b\[[\d;]*m/g, "");
       return line.length > current ? line.length : current;
     }, 0);
+
+    // Store in cache
+    cache.set(cacheKey, wrappedOut);
 
     return wrappedOut;
   }

@@ -100,7 +100,6 @@ function findAnsiCodes(
  */
 export function getActiveAnsiCodes(text: string, position: number): string {
   const codes = findAnsiCodes(text);
-  const activeCodes: string[] = [];
 
   // Track SGR state
   const state: {
