@@ -91,7 +91,10 @@ packages/core/
 │   │   ├── image-renderer.ts # PNG/GIF rendering
 │   │   ├── keys.ts           # Keyboard event handling
 │   │   ├── program.ts        # Terminal program interface
-│   │   └── tput.ts           # Terminfo parser
+│   │   ├── text-utils.ts     # Text truncation and wrapping utilities
+│   │   ├── tput.ts           # Terminfo parser
+│   │   ├── unicode.ts        # Unicode width and character handling
+│   │   └── wrap-cache.ts     # LRU cache for wrapped content
 │   ├── types/                # TypeScript type definitions
 │   │   ├── common.ts         # Common types
 │   │   ├── events.ts         # Event types

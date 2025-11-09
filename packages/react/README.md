@@ -131,6 +131,41 @@ Text component with styling support.
 - `color`, `backgroundColor`
 - `bold`, `italic`, `underline`, `strikethrough`
 - `inverse`, `dim`
+- `textWrap` - Text truncation mode (see below)
+
+**Text Wrapping:**
+
+```tsx
+// Truncate at end with ellipsis (ink-style)
+<Text textWrap="truncate-end" width={20}>
+  This is a very long line that will be truncated
+</Text>
+// Result: "This is a very lo…"
+
+// Truncate in middle
+<Text textWrap="truncate-middle" width={20}>
+  This is a very long line
+</Text>
+// Result: "This is a…ng line"
+
+// Truncate at start
+<Text textWrap="truncate-start" width={20}>
+  This is a very long line
+</Text>
+// Result: "…a very long line"
+
+// Traditional word wrapping
+<Text textWrap="wrap" width={20}>
+  This is a very long line
+</Text>
+// Wraps to multiple lines
+```
+
+**Available modes:**
+- `wrap` - Word wrap to multiple lines (default)
+- `truncate-end` - Truncate at end with ellipsis
+- `truncate-middle` - Truncate in middle with ellipsis
+- `truncate-start` - Truncate at start with ellipsis
 
 ### Spacer
 

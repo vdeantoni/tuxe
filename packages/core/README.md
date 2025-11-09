@@ -14,6 +14,7 @@ Platform-agnostic TUI (Text User Interface) core library with runtime dependency
 - **Runtime Injection**: Platform-specific implementations (fs, process, etc.) provided via dependency injection
 - **Rich Widget Library**: Full set of interactive widgets (boxes, lists, forms, inputs, etc.)
 - **Terminal Control**: Complete terminal manipulation (colors, cursor, mouse, keyboard)
+- **Text Wrapping**: Ink-style truncation modes (end, middle, start) with ANSI code preservation
 - **Image Rendering**: PNG and GIF support with terminal rendering
 - **TypeScript**: Full type safety with comprehensive type definitions
 - **Terminfo Support**: Complete terminfo/termcap database integration
@@ -425,6 +426,78 @@ box.scroll(10); // Scroll down 10 lines
 box.scroll(-5); // Scroll up 5 lines
 box.scrollTo(0); // Scroll to top
 box.setScrollPerc(50); // Scroll to 50%
+```
+
+### Text Wrapping and Truncation
+
+Control how text is wrapped or truncated when it exceeds the widget width:
+
+```typescript
+import { Box, Text } from "@unblessed/core";
+
+// Traditional word wrapping (default)
+const wrappedBox = new Box({
+  parent: screen,
+  width: 20,
+  wrap: true, // Default behavior
+  content: "This is a very long line that will wrap to multiple lines",
+});
+
+// Truncate at end with ellipsis (ink-style)
+const truncatedEnd = new Box({
+  parent: screen,
+  width: 20,
+  textWrap: "truncate-end",
+  content: "This is a very long line",
+});
+// Result: "This is a very lo…"
+
+// Truncate in middle with ellipsis
+const truncatedMiddle = new Box({
+  parent: screen,
+  width: 20,
+  textWrap: "truncate-middle",
+  content: "This is a very long line",
+});
+// Result: "This is a…ng line"
+
+// Truncate at start with ellipsis
+const truncatedStart = new Box({
+  parent: screen,
+  width: 20,
+  textWrap: "truncate-start",
+  content: "This is a very long line",
+});
+// Result: "…a very long line"
+
+// ANSI codes are preserved during truncation
+const coloredText = new Box({
+  parent: screen,
+  width: 15,
+  textWrap: "truncate-end",
+  content: "{red-fg}Hello{/red-fg} {green-fg}World{/green-fg}",
+  tags: true,
+});
+// Colors are preserved in truncated output
+```
+
+**Features:**
+- Four modes: `wrap`, `truncate-end`, `truncate-middle`, `truncate-start`
+- ANSI escape code preservation during truncation
+- Wide character support (CJK, emoji)
+- LRU caching for performance (1000 entry default)
+- Backward compatible (legacy `wrap: boolean` still works)
+
+**Text Utilities:**
+```typescript
+import { truncateText } from "@unblessed/core/lib/text-utils";
+
+// Use truncation utilities directly
+const truncated = truncateText("Long text", 10, {
+  position: "end",
+  ellipsis: "…",
+  fullUnicode: true,
+});
 ```
 
 ### Terminal Emulation

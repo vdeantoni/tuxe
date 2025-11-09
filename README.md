@@ -13,12 +13,13 @@
 ## ✨ Features
 
 - 🎯 **100% TypeScript** - Full type safety with strict mode enabled
-- 🧪 **Comprehensive Tests** - 1,987+ tests with 98.5% coverage
+- 🧪 **Comprehensive Tests** - 2,355+ tests with 98.5% coverage
 - 🌐 **Platform Agnostic** - Works in Node.js and browsers via XTerm.js
 - 🔄 **Backward Compatible** - Drop-in replacement for blessed
 - 📦 **Modern Build** - ESM + CJS dual output, tree-shakeable
 - ⚡ **High Performance** - Optimized rendering with smart CSR and damage buffer
 - 🎨 **Rich Widgets** - 27+ widgets for building terminal UIs
+- ✂️ **Text Truncation** - Ink-style truncation modes with ANSI code preservation
 
 ## 📦 Packages
 

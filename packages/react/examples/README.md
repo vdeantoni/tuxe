@@ -15,6 +15,9 @@ cd packages/react/examples
 tsx hello-react.tsx
 tsx interactive-demo.tsx
 tsx keyboard-game.tsx
+tsx text-wrap-demo.tsx
+tsx theme-demo.tsx
+tsx declarative-animations-demo.tsx
 ```
 
 ## Examples
@@ -35,6 +38,23 @@ Basic demonstration of components and layouts:
 - Static layout showcase
 - Border color examples
 - Component composition
+
+### text-wrap-demo.tsx
+
+Text truncation and wrapping demonstration:
+
+- All 4 textWrap modes (wrap, truncate-end, truncate-middle, truncate-start)
+- ANSI code preservation during truncation
+- Multi-line content handling
+- Backward compatibility with legacy wrap boolean
+- Side-by-side visual comparisons
+
+**Features:**
+
+- Ink-style text truncation
+- Visual comparison of all modes
+- Colored text truncation
+- Width constraint examples
 
 ### interactive-demo.tsx 🎮
 
