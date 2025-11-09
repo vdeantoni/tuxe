@@ -45,6 +45,21 @@ export const COMMON_WIDGET_OPTIONS = {
 export interface BoxProps extends InteractiveWidgetProps {
   content?: string;
   children?: ReactNode;
+
+  /**
+   * Wrap text if it exceeds width (legacy boolean).
+   */
+  wrap?: boolean;
+
+  /**
+   * Text wrapping/truncation mode (ink-style).
+   *
+   * - 'wrap': Word wrap text to multiple lines (default)
+   * - 'truncate-end': Truncate at end with ellipsis: "Hello W…"
+   * - 'truncate-middle': Truncate in middle with ellipsis: "Hel…rld"
+   * - 'truncate-start': Truncate at start with ellipsis: "…World"
+   */
+  textWrap?: "wrap" | "truncate-end" | "truncate-middle" | "truncate-start";
 }
 
 /**
@@ -112,6 +127,15 @@ export class BoxDescriptor<T extends BoxProps> extends WidgetDescriptor<
     // Content
     if (this.props.content !== undefined) {
       widgetOptions.content = this.props.content;
+    }
+
+    // Text wrapping support
+    if (this.props.wrap !== undefined) {
+      widgetOptions.wrap = this.props.wrap;
+    }
+
+    if (this.props.textWrap !== undefined) {
+      widgetOptions.textWrap = this.props.textWrap;
     }
 
     return widgetOptions;
